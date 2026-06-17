@@ -99,7 +99,7 @@ export default function App() {
   const [activeAgentIndex, setActiveAgentIndex] = useState<number>(-1); // -1 = idle
   const [logs, setLogs] = useState<AgentLog[]>([]);
   const [analysisResult, setAnalysisResult] = useState<AgentSystemResult | null>(null);
-  const [activeResultTab, setActiveResultTab] = useState<'health' | 'risk' | 'overlap' | 'backtest' | 'auditor' | 'premium'>('health');
+  const [activeResultTab, setActiveResultTab] = useState<'tab-saglik-karnesi' | 'tab-risk-stres' | 'tab-fon-iliskileri' | 'tab-backtest-tahmin' | 'tab-ai-analist' | 'tab-premium'>('tab-saglik-karnesi');
   const [activeAuditorQuestion, setActiveAuditorQuestion] = useState<number | null>(null);
   const [premiumAlertConfig, setPremiumAlertConfig] = useState({ email: '', sms: '', volatilityAlert: true, drawdownAlert: true });
   
@@ -1290,41 +1290,78 @@ export default function App() {
 
           {/* Results dashboard tab layout */}
           {analysisResult ? (
-            <div ref={resultsRef} className="glass-card" style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              
-              {/* Dashboard Tabs Bar */}
-              <div className="results-tab-bar" style={{ 
-                display: 'flex', 
-                flexWrap: 'wrap',
-                gap: '6px', 
-                borderBottom: '1px solid var(--border-glass)',
-                paddingBottom: '0.75rem',
-                marginBottom: '0.5rem'
-              }}>
+            <div ref={resultsRef} className="glass-card results-dashboard-container" style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'row', gap: '1.5rem', minHeight: '600px' }}>
+              <style dangerouslySetInnerHTML={{__html: `
+                @media (max-width: 768px) {
+                  .results-dashboard-container {
+                    flex-direction: column !important;
+                    padding: 0.75rem !important;
+                  }
+                  .results-sidebar {
+                    width: 100% !important;
+                    flex-direction: row !important;
+                    overflow-x: auto !important;
+                    border-right: none !important;
+                    border-bottom: 1px solid var(--border-glass) !important;
+                    padding-right: 0 !important;
+                    padding-bottom: 0.75rem !important;
+                    margin-bottom: 0.5rem !important;
+                  }
+                  .sidebar-tab-btn {
+                    width: auto !important;
+                    flex-shrink: 0 !important;
+                  }
+                  .results-sidebar-title {
+                    display: none !important;
+                  }
+                }
+              `}} />
+
+              {/* Sidebar Menu (Left Side) */}
+              <div 
+                className="results-sidebar" 
+                style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: '6px', 
+                  width: '200px',
+                  flexShrink: 0,
+                  borderRight: '1px solid var(--border-glass)',
+                  paddingRight: '1rem',
+                }}
+              >
+                <div className="results-sidebar-title" style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem', paddingLeft: '8px' }}>
+                  Kontrol Paneli
+                </div>
                 {[
-                  { id: 'health', label: 'Sağlık Karnesi', icon: <Award size={14} /> },
-                  { id: 'risk', label: 'Risk & Stres Testi', icon: <ShieldAlert size={14} /> },
-                  { id: 'overlap', label: 'Fon İlişkileri', icon: <Link size={14} /> },
-                  { id: 'backtest', label: 'Backtest & Tahmin', icon: <TrendingUp size={14} /> },
-                  { id: 'auditor', label: 'AI Analist & Denetçi', icon: <Cpu size={14} /> },
-                  { id: 'premium', label: 'Premium', icon: <Zap size={14} /> }
+                  { id: 'tab-saglik-karnesi', label: 'Sağlık Karnesi', icon: <Award size={14} /> },
+                  { id: 'tab-risk-stres', label: 'Risk & Stres Testi', icon: <ShieldAlert size={14} /> },
+                  { id: 'tab-fon-iliskileri', label: 'Fon İlişkileri', icon: <Link size={14} /> },
+                  { id: 'tab-backtest-tahmin', label: 'Backtest & Tahmin', icon: <TrendingUp size={14} /> },
+                  { id: 'tab-ai-analist', label: 'AI Analist & Denetçi', icon: <Cpu size={14} /> },
+                  { id: 'tab-premium', label: 'Premium Bölümü', icon: <Zap size={14} /> }
                 ].map(tab => (
                   <button
                     key={tab.id}
-                    className="btn"
+                    id={tab.id}
+                    className="btn sidebar-tab-btn"
                     style={{
                       background: activeResultTab === tab.id ? 'var(--bg-card-hover)' : 'transparent',
                       border: 'none',
-                      borderRadius: '2px',
+                      borderRadius: '8px',
                       color: activeResultTab === tab.id ? 'var(--accent-gold)' : 'var(--text-secondary)',
                       fontWeight: activeResultTab === tab.id ? 700 : 500,
-                      fontSize: '0.775rem',
-                      padding: '6px 12px',
-                      height: '32px',
+                      fontSize: '0.75rem',
+                      padding: '8px 12px',
+                      height: '36px',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '6px',
-                      margin: 0,
+                      gap: '8px',
+                      width: '100%',
+                      textAlign: 'left',
+                      justifyContent: 'flex-start',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
                       boxShadow: activeResultTab === tab.id ? 'var(--shadow-glow-gold)' : 'none'
                     }}
                     onClick={() => setActiveResultTab(tab.id as any)}
@@ -1334,8 +1371,10 @@ export default function App() {
                 ))}
               </div>
 
-              {/* TAB 1: SAĞLIK KARNESİ */}
-              {activeResultTab === 'health' && (
+              {/* Main Content Area (Right Side) */}
+              <div className="results-content-area" style={{ flex: 1, minWidth: 0 }}>
+                {/* TAB 1: SAĞLIK KARNESİ */}
+                {activeResultTab === 'tab-saglik-karnesi' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   
                   {/* Gauge & Cards Container */}
@@ -1525,7 +1564,7 @@ export default function App() {
               )}
 
               {/* TAB 2: RISK & STRES TESTI */}
-              {activeResultTab === 'risk' && (
+              {activeResultTab === 'tab-risk-stres' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   
                   {/* Advanced Risk metrics list */}
@@ -1636,7 +1675,7 @@ export default function App() {
               )}
 
               {/* TAB 3: FON İLİŞKİLERİ & MATRİS */}
-              {activeResultTab === 'overlap' && (
+              {activeResultTab === 'tab-fon-iliskileri' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   
                   {/* Diversification Score & Matrix Header */}
@@ -1715,7 +1754,7 @@ export default function App() {
               )}
 
               {/* TAB 4: BACKTEST & GELECEK TAHMİNİ */}
-              {activeResultTab === 'backtest' && (
+              {activeResultTab === 'tab-backtest-tahmin' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   
                   {/* Backtest metrics display */}
@@ -2333,7 +2372,7 @@ export default function App() {
               )}
 
               {/* TAB 5: AI ANALİST & DENETÇİ */}
-              {activeResultTab === 'auditor' && (
+              {activeResultTab === 'tab-ai-analist' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   
                   {/* AI Macro Financial Dashboard */}
@@ -2467,7 +2506,7 @@ export default function App() {
               )}
 
               {/* TAB 6: PREMIUM HİZMETLER */}
-              {activeResultTab === 'premium' && (
+              {activeResultTab === 'tab-premium' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   
                   {/* Risk Alert System Setup Card */}
@@ -2611,7 +2650,7 @@ export default function App() {
               )}
 
               {/* Taktiksel Optimizasyon Quick Banner */}
-              {activeResultTab !== 'premium' && (
+              {activeResultTab !== 'tab-premium' && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px dashed var(--border-glass)', paddingTop: '1.25rem', marginTop: '0.75rem' }}>
                   <div style={{ flex: 1, minWidth: '240px' }}>
                     <h4 style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--accent-gold)', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -2631,6 +2670,7 @@ export default function App() {
                   </button>
                 </div>
               )}
+              </div> {/* results-content-area close */}
             </div>
           ) : isRunning ? (
             <div className="glass-card loading-results-placeholder" style={{ 
