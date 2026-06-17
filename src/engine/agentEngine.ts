@@ -859,7 +859,7 @@ export function runLocalAnalysis(
   // 5. Backtest Merkezi
   const totalReturn = Math.round(dataOutputs.reduce((sum, d) => {
     const p = normalizedPortfolio.find(x => x.code === d.fund_code);
-    return sum + ((d.historical_returns['1Y'] || 60) * (p?.weight || 0));
+    return sum + ((d.historical_returns['1Y'] || 60) * ((p?.weight || 0) / 100));
   }, 0));
   const annualReturn = Math.round(totalReturn * 0.85);
   
