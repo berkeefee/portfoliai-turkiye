@@ -126,6 +126,67 @@ export default function App() {
     }));
   };
 
+  // Automatically trigger orchestration if query parameters are present
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('run') === 'true') {
+      const risk = params.get('risk');
+      const goal = params.get('goal');
+      const hor = params.get('horizon');
+      const mode = params.get('mode') as 'build' | 'analyze' | null;
+      const live = params.get('live') === 'true';
+      const portfolioStr = params.get('portfolio');
+
+      let parsedRisk = riskLevel;
+      let parsedGoal = investmentGoal;
+      let parsedHorizon = horizon;
+      let parsedMode = activeMode;
+      let parsedPortfolio = customPortfolio;
+
+      if (risk) {
+        parsedRisk = parseInt(risk, 10);
+        setRiskLevel(parsedRisk);
+      }
+      if (goal) {
+        parsedGoal = goal;
+        setInvestmentGoal(parsedGoal);
+      }
+      if (hor) {
+        parsedHorizon = hor;
+        setHorizon(parsedHorizon);
+      }
+      if (mode) {
+        parsedMode = mode;
+        setActiveMode(parsedMode);
+      }
+      if (portfolioStr) {
+        try {
+          const arr = JSON.parse(portfolioStr);
+          if (Array.isArray(arr)) {
+            parsedPortfolio = arr;
+            setCustomPortfolio(parsedPortfolio);
+          }
+        } catch (e) {
+          console.error("Failed to parse custom portfolio from URL:", e);
+        }
+      }
+
+      // Clear query parameters from address bar to keep it clean and prevent rerunning on manual refresh
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      // Trigger orchestration in the next tick with parsed values
+      setTimeout(() => {
+        startOrchestration(live, {
+          riskLevel: parsedRisk,
+          investmentGoal: parsedGoal,
+          horizon: parsedHorizon,
+          activeMode: parsedMode,
+          customPortfolio: parsedPortfolio
+        });
+      }, 100);
+    }
+  }, []);
+
   const handleMouseMoveBacktest = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     if (!backtestSvgRef.current || !analysisResult?.backtest?.monthlyData) return;
     
@@ -223,11 +284,27 @@ export default function App() {
   };
 
   // Run Orchestrator Pipeline
-  const startOrchestration = async (isLiveMode: boolean) => {
+  // Run Orchestrator Pipeline
+  const startOrchestration = async (
+    isLiveMode: boolean,
+    overrideParams?: {
+      riskLevel: number;
+      investmentGoal: string;
+      horizon: string;
+      activeMode: 'build' | 'analyze';
+      customPortfolio: AgentPortfolioItem[];
+    }
+  ) => {
     // Blur active element to prevent browser focus tracking from scrolling on layout shift
     if (document.activeElement && typeof (document.activeElement as any).blur === 'function') {
       (document.activeElement as any).blur();
     }
+
+    const rL = overrideParams ? overrideParams.riskLevel : riskLevel;
+    const iG = overrideParams ? overrideParams.investmentGoal : investmentGoal;
+    const hz = overrideParams ? overrideParams.horizon : horizon;
+    const aM = overrideParams ? overrideParams.activeMode : activeMode;
+    const cP = overrideParams ? overrideParams.customPortfolio : customPortfolio;
 
     setIsRunning(true);
     setLogs([]);
@@ -247,8 +324,8 @@ export default function App() {
       }
     }, 50);
 
-    const modeText = activeMode === 'analyze' 
-      ? `Mevcut Kendi Portföyü Analizi Başlatıldı:\n- Girilen Portföy: ${JSON.stringify(customPortfolio)}\n`
+    const modeText = aM === 'analyze' 
+      ? `Mevcut Kendi Portföyü Analizi Başlatıldı:\n- Girilen Portföy: ${JSON.stringify(cP)}\n`
       : 'Yeni AI Portföy Yapılandırma Başlatıldı\n';
 
     const initialLogs: AgentLog[] = [
@@ -256,8 +333,8 @@ export default function App() {
         agentName: 'Orchestrator Agent',
         role: 'Master Controller',
         status: 'running',
-        promptSent: `${modeText}- Hedef Risk Seviyesi: ${riskLevel}/10\n- Yatırım Amacı: ${investmentGoal}\n- Yatırım Vadesi: ${horizon}\n- Makro Göstergeler: ${JSON.stringify(TURKEY_MACRO_SIGNALS, null, 2)}`,
-        outputReceived: activeMode === 'analyze'
+        promptSent: `${modeText}- Hedef Risk Seviyesi: ${rL}/10\n- Yatırım Amacı: ${iG}\n- Yatırım Vadesi: ${hz}\n- Makro Göstergeler: ${JSON.stringify(TURKEY_MACRO_SIGNALS, null, 2)}`,
+        outputReceived: aM === 'analyze'
           ? 'Mevcut portföy analiz edilmeye başlandı. Risk parametreleri ve veri toplayıcılar tetikleniyor...'
           : 'Analiz başlatıldı. Müşteri risk seviyesine göre hedef varlık dağılımı yapılıyor. Veriler için Data Agent tetikleniyor...',
         timestamp: new Date().toISOString()
@@ -269,11 +346,11 @@ export default function App() {
       // Simulation mode
       const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
       const localResult = runLocalAnalysis(
-        riskLevel,
-        investmentGoal,
-        horizon,
+        rL,
+        iG,
+        hz,
         TURKEY_MACRO_SIGNALS,
-        activeMode === 'analyze' ? customPortfolio : undefined
+        aM === 'analyze' ? cP : undefined
       );
 
       await delay(1200);
@@ -298,7 +375,7 @@ export default function App() {
           agentName: 'Risk Analyzer Agent',
           role: 'Portfolio Risk Engine',
           status: 'success',
-          promptSent: `Oluşturulan fon portföyünün risk oranları, volatilite seviyesi ve drawdown olasılığı, hedef risk seviyesi (${riskLevel}) ile karşılaştırılıyor...`,
+          promptSent: `Oluşturulan fon portföyünün risk oranları, volatilite seviyesi ve drawdown olasılığı, hedef risk seviyesi (${rL}) ile karşılaştırılıyor...`,
           outputReceived: JSON.stringify(localResult.risk, null, 2),
           timestamp: new Date().toISOString()
         }
@@ -348,7 +425,7 @@ export default function App() {
 
       await delay(1500);
       setActiveAgentIndex(6); // Advisor Agent active
-      const finalReportText = generateSimulationAdvisorReport(localResult, riskLevel, investmentGoal, horizon);
+      const finalReportText = generateSimulationAdvisorReport(localResult, rL, iG, hz);
       setLogs(prev => [
         ...prev,
         {
@@ -374,10 +451,10 @@ export default function App() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            riskLevel,
-            investmentGoal,
-            horizon,
-            customPortfolio: activeMode === 'analyze' ? customPortfolio : undefined
+            riskLevel: rL,
+            investmentGoal: iG,
+            horizon: hz,
+            customPortfolio: aM === 'analyze' ? cP : undefined
           })
         });
 
@@ -402,12 +479,12 @@ export default function App() {
             try {
               const data = JSON.parse(line);
               if (data.type === 'log') {
-                const newLog = data.log;
+                const newLog: AgentLog = data.log;
                 setLogs(prev => {
-                  const existingIndex = prev.findIndex(l => l.agentName === newLog.agentName);
-                  if (existingIndex > -1) {
+                  const idx = prev.findIndex(l => l.agentName === newLog.agentName);
+                  if (idx !== -1) {
                     const updated = [...prev];
-                    updated[existingIndex] = newLog;
+                    updated[idx] = newLog;
                     return updated;
                   }
                   return [...prev, newLog];
@@ -420,6 +497,7 @@ export default function App() {
                 else if (newLog.agentName.includes('Optimization') || newLog.agentName.includes('Optimizer')) setActiveAgentIndex(5);
                 else if (newLog.agentName.includes('Advisor')) setActiveAgentIndex(6);
               } else if (data.type === 'result') {
+                setActiveAgentIndex(-1);
                 setAnalysisResult(data.result);
               } else if (data.type === 'error') {
                 throw new Error(data.error);
@@ -437,6 +515,7 @@ export default function App() {
       }
     }
   };
+
 
   // Helper to parse markdown
   const renderAdvisorReport = (markdownText: string) => {
@@ -570,7 +649,8 @@ export default function App() {
       </header>
 
       {/* Main Grid */}
-      <div className="dashboard-grid">
+      {!analysisResult && (
+        <div className="dashboard-grid">
         
         {/* Left Column: Risk Profiler Form */}
         <div className="dashboard-col" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -875,7 +955,20 @@ export default function App() {
                   <button 
                     className="btn btn-primary" 
                     style={{ flex: 1, padding: '0.85rem' }} 
-                    onClick={() => startOrchestration(false)}
+                    onClick={() => {
+                      const params = new URLSearchParams({
+                        risk: riskLevel.toString(),
+                        goal: investmentGoal,
+                        horizon: horizon,
+                        mode: activeMode,
+                        live: 'false',
+                        run: 'true'
+                      });
+                      if (activeMode === 'analyze') {
+                        params.append('portfolio', JSON.stringify(customPortfolio));
+                      }
+                      window.open(`${window.location.origin}${window.location.pathname}?${params.toString()}`, '_blank');
+                    }}
                     disabled={isDisabled}
                   >
                     <RefreshCw size={16} className={isRunning ? 'pulse-dot' : ''} />
@@ -885,7 +978,20 @@ export default function App() {
                   <button 
                     className="btn btn-accent" 
                     style={{ flex: 1, padding: '0.85rem' }} 
-                    onClick={() => startOrchestration(true)}
+                    onClick={() => {
+                      const params = new URLSearchParams({
+                        risk: riskLevel.toString(),
+                        goal: investmentGoal,
+                        horizon: horizon,
+                        mode: activeMode,
+                        live: 'true',
+                        run: 'true'
+                      });
+                      if (activeMode === 'analyze') {
+                        params.append('portfolio', JSON.stringify(customPortfolio));
+                      }
+                      window.open(`${window.location.origin}${window.location.pathname}?${params.toString()}`, '_blank');
+                    }}
                     disabled={isDisabled}
                   >
                     <Play size={16} />
@@ -1287,9 +1393,38 @@ export default function App() {
             </div>
             {/* Scroll anchor removed to prevent pulling screen down on every log */}
           </div>
+          
+          {/* If running, show loading results placeholder inside the right column */}
+          {isRunning && (
+            <div className="glass-card loading-results-placeholder" style={{ 
+              flex: 1, 
+              minHeight: '400px', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              background: 'rgba(197, 160, 89, 0.02)',
+              border: '1px dashed var(--border-glass)',
+              gap: '1rem',
+              marginTop: '1.5rem',
+              padding: '2rem',
+              textAlign: 'center'
+            }}>
+              <div className="pulse-dot" style={{ width: '12px', height: '12px', background: 'var(--accent-gold)' }}></div>
+              <p style={{ fontSize: '0.95rem', color: 'var(--text-primary)', margin: 0, fontWeight: 700 }}>
+                Yapay Zeka Portföy Analiz Raporu Hazırlanıyor...
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>
+                Analist ajanlar TEFAS verilerini ve risk parametrelerini inceliyor. Lütfen bekleyin.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
 
-          {/* Results dashboard tab layout */}
-          {analysisResult ? (
+      {/* Results dashboard tab layout */}
+      {analysisResult && (
             <div ref={resultsRef} className="glass-card results-dashboard-container" style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'row', gap: '1.5rem', minHeight: '600px' }}>
               <style dangerouslySetInnerHTML={{__html: `
                 @media (max-width: 768px) {
@@ -1313,6 +1448,12 @@ export default function App() {
                   }
                   .results-sidebar-title {
                     display: none !important;
+                  }
+                  .reset-analysis-btn {
+                    width: auto !important;
+                    flex-shrink: 0 !important;
+                    margin-top: 0 !important;
+                    margin-left: auto !important;
                   }
                 }
               `}} />
@@ -1369,6 +1510,42 @@ export default function App() {
                     {tab.icon} {tab.label}
                   </button>
                 ))}
+                
+                {/* Reset / Back to parameters form */}
+                <button
+                  className="btn sidebar-tab-btn reset-analysis-btn"
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.05)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    borderRadius: '8px',
+                    color: '#ef4444',
+                    fontWeight: 600,
+                    fontSize: '0.75rem',
+                    padding: '8px 12px',
+                    height: '36px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    textAlign: 'left',
+                    justifyContent: 'flex-start',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    marginTop: 'auto',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.05)';
+                  }}
+                  onClick={() => {
+                    setAnalysisResult(null);
+                    setActiveResultTab('tab-saglik-karnesi');
+                  }}
+                >
+                  <RefreshCw size={12} /> Yeni Analiz Başlat
+                </button>
               </div>
 
               {/* Main Content Area (Right Side) */}
@@ -2672,33 +2849,7 @@ export default function App() {
               )}
               </div> {/* results-content-area close */}
             </div>
-          ) : isRunning ? (
-            <div className="glass-card loading-results-placeholder" style={{ 
-              flex: 1, 
-              minHeight: '400px', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              background: 'rgba(197, 160, 89, 0.02)',
-              border: '1px dashed var(--border-glass)',
-              gap: '1rem',
-              marginTop: '1.5rem',
-              padding: '2rem',
-              textAlign: 'center'
-            }}>
-              <div className="pulse-dot" style={{ width: '12px', height: '12px', background: 'var(--accent-gold)' }}></div>
-              <p style={{ fontSize: '0.95rem', color: 'var(--text-primary)', margin: 0, fontWeight: 700 }}>
-                Yapay Zeka Portföy Analiz Raporu Hazırlanıyor...
-              </p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>
-                Analist ajanlar TEFAS verilerini ve risk parametrelerini inceliyor. Lütfen bekleyin.
-              </p>
-            </div>
-          ) : null}
-        </div>
-
-      </div>
+          )}
 
       {/* SEO Information & FAQ Section */}
       <footer className="glass-card seo-footer">
