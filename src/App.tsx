@@ -1925,19 +1925,32 @@ export default function App() {
                             const minVal = Math.min(...allVals) * 0.95;
                             const maxVal = Math.max(...allVals) * 1.05;
                             
-                            const getPoints = (data: { date: string, value: number }[]) => {
-                              return data.map((d, i) => {
+                            const getBezierPath = (data: { date: string, value: number }[]) => {
+                              if (data.length === 0) return '';
+                              const points = data.map((d, i) => {
                                 const x = (i / (data.length - 1)) * 480 + 10;
                                 const y = 140 - ((d.value - minVal) / (maxVal - minVal)) * 120;
-                                return `${x},${y}`;
-                              }).join(' ');
+                                return { x, y };
+                              });
+                              
+                              let path = `M ${points[0].x} ${points[0].y}`;
+                              for (let i = 0; i < points.length - 1; i++) {
+                                const p0 = points[i];
+                                const p1 = points[i + 1];
+                                const cpX1 = p0.x + (p1.x - p0.x) / 2;
+                                const cpY1 = p0.y;
+                                const cpX2 = p0.x + (p1.x - p0.x) / 2;
+                                const cpY2 = p1.y;
+                                path += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${p1.x} ${p1.y}`;
+                              }
+                              return path;
                             };
                             
-                            const portfolioPoints = getPoints(mData);
-                            const bistPoints = getPoints(bistData);
-                            const goldPoints = getPoints(goldData);
+                            const portfolioPath = getBezierPath(mData);
+                            const bistPath = getBezierPath(bistData);
+                            const goldPath = getBezierPath(goldData);
                             
-                            const areaPoints = `10,140 ${portfolioPoints} 490,140`;
+                            const areaPath = portfolioPath ? `${portfolioPath} L 490,140 L 10,140 Z` : '';
                             const xCoord = hoveredBacktestIndex !== null ? (hoveredBacktestIndex / (mData.length - 1)) * 480 + 10 : 0;
 
                             return (
@@ -1963,52 +1976,52 @@ export default function App() {
                                   <line x1="10" y1="140" x2="490" y2="140" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
                                   
                                   {/* Area Fill under Portfolio Line */}
-                                  <polygon points={areaPoints} fill="url(#backtestAreaGrad)" />
+                                  <path d={areaPath} fill="url(#backtestAreaGrad)" style={{ transition: 'd 0.5s ease-in-out' }} />
                                   
                                   {/* BIST 100 Line */}
-                                  <polyline 
-                                    points={bistPoints} 
+                                  <path 
+                                    d={bistPath} 
                                     fill="none" 
                                     stroke="#3b82f6" 
-                                    strokeWidth="1.75" 
+                                    strokeWidth="2" 
                                     strokeLinecap="round" 
                                     strokeLinejoin="round" 
                                     className="animate-line-secondary"
                                     style={{ 
                                       opacity: (backtestCompareMode === 'all' || backtestCompareMode === 'bist') ? 0.85 : 0,
-                                      transition: 'opacity 0.4s ease, points 0.5s ease-in-out',
+                                      transition: 'opacity 0.4s ease, d 0.5s ease-in-out',
                                       pointerEvents: 'none'
                                     }}
                                   />
                                   
                                   {/* Saf Altın Line */}
-                                  <polyline 
-                                    points={goldPoints} 
+                                  <path 
+                                    d={goldPath} 
                                     fill="none" 
                                     stroke="#f59e0b" 
-                                    strokeWidth="1.75" 
+                                    strokeWidth="2" 
                                     strokeLinecap="round" 
                                     strokeLinejoin="round" 
                                     className="animate-line-tertiary"
                                     style={{ 
                                       opacity: (backtestCompareMode === 'all' || backtestCompareMode === 'gold') ? 0.85 : 0,
-                                      transition: 'opacity 0.4s ease, points 0.5s ease-in-out',
+                                      transition: 'opacity 0.4s ease, d 0.5s ease-in-out',
                                       pointerEvents: 'none'
                                     }}
                                   />
 
                                   {/* AI Portfolio Line (Primary) */}
-                                  <polyline 
-                                    points={portfolioPoints} 
+                                  <path 
+                                    d={portfolioPath} 
                                     fill="none" 
                                     stroke="#10b981" 
-                                    strokeWidth="3.25" 
+                                    strokeWidth="3.5" 
                                     strokeLinecap="round" 
                                     strokeLinejoin="round" 
                                     className="animate-line-primary"
                                     style={{
-                                      filter: 'drop-shadow(0px 0px 3px rgba(16, 185, 129, 0.4))',
-                                      transition: 'points 0.5s ease-in-out'
+                                      filter: 'drop-shadow(0px 0px 4px rgba(16, 185, 129, 0.5))',
+                                      transition: 'd 0.5s ease-in-out'
                                     }}
                                   />
                                   

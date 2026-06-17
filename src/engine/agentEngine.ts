@@ -865,46 +865,46 @@ export function runLocalAnalysis(
   
   const monthlyData = [
     { date: 'Tem 25', value: 100.0 },
-    { date: 'Ağu 25', value: 102.3 },
-    { date: 'Eyl 25', value: 105.6 },
-    { date: 'Eki 25', value: 101.2 },
-    { date: 'Kas 25', value: 108.4 },
-    { date: 'Ara 25', value: 114.9 },
-    { date: 'Oca 26', value: 122.1 },
-    { date: 'Şub 26', value: 128.5 },
-    { date: 'Mar 26', value: 135.2 },
-    { date: 'Nis 26', value: 141.0 },
-    { date: 'May 26', value: 138.8 },
-    { date: 'Haz 26', value: 100.0 + totalReturn * 0.8 }
+    { date: 'Ağu 25', value: 100.0 + totalReturn * 0.08 + 2.5 },
+    { date: 'Eyl 25', value: 100.0 + totalReturn * 0.18 - 1.2 },
+    { date: 'Eki 25', value: 100.0 + totalReturn * 0.12 - 4.5 },
+    { date: 'Kas 25', value: 100.0 + totalReturn * 0.28 + 3.0 },
+    { date: 'Ara 25', value: 100.0 + totalReturn * 0.42 + 6.5 },
+    { date: 'Oca 26', value: 100.0 + totalReturn * 0.58 + 1.0 },
+    { date: 'Şub 26', value: 100.0 + totalReturn * 0.68 - 2.0 },
+    { date: 'Mar 26', value: 100.0 + totalReturn * 0.82 + 4.5 },
+    { date: 'Nis 26', value: 100.0 + totalReturn * 0.92 + 8.0 },
+    { date: 'May 26', value: 100.0 + totalReturn * 0.88 + 1.5 },
+    { date: 'Haz 26', value: 100.0 + totalReturn }
   ];
 
   const bist100Data = [
     { date: 'Tem 25', value: 100.0 },
-    { date: 'Ağu 25', value: 101.5 },
-    { date: 'Eyl 25', value: 104.8 },
-    { date: 'Eki 25', value: 99.2 },
-    { date: 'Kas 25', value: 105.1 },
-    { date: 'Ara 25', value: 108.7 },
-    { date: 'Oca 26', value: 114.2 },
-    { date: 'Şub 26', value: 119.5 },
-    { date: 'Mar 26', value: 125.1 },
-    { date: 'Nis 26', value: 130.4 },
-    { date: 'May 26', value: 127.8 },
+    { date: 'Ağu 25', value: 102.5 },
+    { date: 'Eyl 25', value: 106.8 },
+    { date: 'Eki 25', value: 94.2 },
+    { date: 'Kas 25', value: 101.1 },
+    { date: 'Ara 25', value: 109.7 },
+    { date: 'Oca 26', value: 118.2 },
+    { date: 'Şub 26', value: 114.5 },
+    { date: 'Mar 26', value: 126.1 },
+    { date: 'Nis 26', value: 135.4 },
+    { date: 'May 26', value: 129.8 },
     { date: 'Haz 26', value: 148.0 }
   ];
 
   const goldData = [
     { date: 'Tem 25', value: 100.0 },
-    { date: 'Ağu 25', value: 103.2 },
-    { date: 'Eyl 25', value: 105.4 },
-    { date: 'Eki 25', value: 107.1 },
-    { date: 'Kas 25', value: 106.5 },
-    { date: 'Ara 25', value: 111.3 },
-    { date: 'Oca 26', value: 115.8 },
-    { date: 'Şub 26', value: 121.2 },
-    { date: 'Mar 26', value: 127.6 },
-    { date: 'Nis 26', value: 134.1 },
-    { date: 'May 26', value: 139.5 },
+    { date: 'Ağu 25', value: 105.2 },
+    { date: 'Eyl 25', value: 109.4 },
+    { date: 'Eki 25', value: 112.1 },
+    { date: 'Kas 25', value: 108.5 },
+    { date: 'Ara 25', value: 114.3 },
+    { date: 'Oca 26', value: 120.8 },
+    { date: 'Şub 26', value: 126.2 },
+    { date: 'Mar 26', value: 121.6 },
+    { date: 'Nis 26', value: 129.1 },
+    { date: 'May 26', value: 137.5 },
     { date: 'Haz 26', value: 142.5 }
   ];
 
