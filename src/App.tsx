@@ -955,20 +955,7 @@ export default function App() {
                   <button 
                     className="btn btn-primary" 
                     style={{ flex: 1, padding: '0.85rem' }} 
-                    onClick={() => {
-                      const params = new URLSearchParams({
-                        risk: riskLevel.toString(),
-                        goal: investmentGoal,
-                        horizon: horizon,
-                        mode: activeMode,
-                        live: 'false',
-                        run: 'true'
-                      });
-                      if (activeMode === 'analyze') {
-                        params.append('portfolio', JSON.stringify(customPortfolio));
-                      }
-                      window.open(`${window.location.origin}${window.location.pathname}?${params.toString()}`, '_blank');
-                    }}
+                    onClick={() => startOrchestration(false)}
                     disabled={isDisabled}
                   >
                     <RefreshCw size={16} className={isRunning ? 'pulse-dot' : ''} />
@@ -978,20 +965,7 @@ export default function App() {
                   <button 
                     className="btn btn-accent" 
                     style={{ flex: 1, padding: '0.85rem' }} 
-                    onClick={() => {
-                      const params = new URLSearchParams({
-                        risk: riskLevel.toString(),
-                        goal: investmentGoal,
-                        horizon: horizon,
-                        mode: activeMode,
-                        live: 'true',
-                        run: 'true'
-                      });
-                      if (activeMode === 'analyze') {
-                        params.append('portfolio', JSON.stringify(customPortfolio));
-                      }
-                      window.open(`${window.location.origin}${window.location.pathname}?${params.toString()}`, '_blank');
-                    }}
+                    onClick={() => startOrchestration(true)}
                     disabled={isDisabled}
                   >
                     <Play size={16} />
@@ -2895,8 +2869,8 @@ export default function App() {
         <div className="seo-footer-bottom">
           <span>© 2026 Çalışkan Borsa. Tüm hakları saklıdır. Bu platform yatırım tavsiyesi sunmaz; yalnızca eğitim ve analiz amaçlıdır.</span>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <a href="https://portfolio-ai.com.tr/">Ana Sayfa</a>
-            <a href="https://portfolio-ai.com.tr/sitemap.xml">Sitemap</a>
+            <a href="https://portfolio-ai.com.tr/" target="_blank" rel="noopener noreferrer">Ana Sayfa</a>
+            <a href="https://portfolio-ai.com.tr/sitemap.xml" target="_blank" rel="noopener noreferrer">Sitemap</a>
             <a 
               href="https://x.com/caliskanborsa6" 
               target="_blank" 
