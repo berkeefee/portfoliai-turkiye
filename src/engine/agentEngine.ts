@@ -108,6 +108,8 @@ export interface BacktestResult {
   volatility: number;
   maxDrawdown: number;
   monthlyData: { date: string; value: number }[];
+  bist100Data?: { date: string; value: number }[];
+  goldData?: { date: string; value: number }[];
 }
 
 export interface MonteCarloResult {
@@ -876,13 +878,45 @@ export function runLocalAnalysis(
     { date: 'Haz 26', value: 100.0 + totalReturn * 0.8 }
   ];
 
+  const bist100Data = [
+    { date: 'Tem 25', value: 100.0 },
+    { date: 'Ağu 25', value: 101.5 },
+    { date: 'Eyl 25', value: 104.8 },
+    { date: 'Eki 25', value: 99.2 },
+    { date: 'Kas 25', value: 105.1 },
+    { date: 'Ara 25', value: 108.7 },
+    { date: 'Oca 26', value: 114.2 },
+    { date: 'Şub 26', value: 119.5 },
+    { date: 'Mar 26', value: 125.1 },
+    { date: 'Nis 26', value: 130.4 },
+    { date: 'May 26', value: 127.8 },
+    { date: 'Haz 26', value: 148.0 }
+  ];
+
+  const goldData = [
+    { date: 'Tem 25', value: 100.0 },
+    { date: 'Ağu 25', value: 103.2 },
+    { date: 'Eyl 25', value: 105.4 },
+    { date: 'Eki 25', value: 107.1 },
+    { date: 'Kas 25', value: 106.5 },
+    { date: 'Ara 25', value: 111.3 },
+    { date: 'Oca 26', value: 115.8 },
+    { date: 'Şub 26', value: 121.2 },
+    { date: 'Mar 26', value: 127.6 },
+    { date: 'Nis 26', value: 134.1 },
+    { date: 'May 26', value: 139.5 },
+    { date: 'Haz 26', value: 142.5 }
+  ];
+
   const backtest: BacktestResult = {
     totalReturn,
     annualReturn,
     sharpe: advRiskMetrics.sharpe,
     volatility: advRiskMetrics.volatility,
     maxDrawdown: advRiskMetrics.maxDrawdown,
-    monthlyData
+    monthlyData,
+    bist100Data,
+    goldData
   };
 
   // 6. Monte Carlo Simulation

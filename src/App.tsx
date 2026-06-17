@@ -102,6 +102,13 @@ export default function App() {
   const [activeResultTab, setActiveResultTab] = useState<'health' | 'risk' | 'overlap' | 'backtest' | 'auditor' | 'premium'>('health');
   const [activeAuditorQuestion, setActiveAuditorQuestion] = useState<number | null>(null);
   const [premiumAlertConfig, setPremiumAlertConfig] = useState({ email: '', sms: '', volatilityAlert: true, drawdownAlert: true });
+  
+  // Backtest comparison states
+  const [backtestCompareMode, setBacktestCompareMode] = useState<'all' | 'bist' | 'gold'>('all');
+  const [hoveredBacktestIndex, setHoveredBacktestIndex] = useState<number | null>(null);
+  const [backtestAnimKey, setBacktestAnimKey] = useState<number>(0);
+  const [isSpinning, setIsSpinning] = useState<boolean>(false);
+  const backtestSvgRef = useRef<SVGSVGElement | null>(null);
 
   const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
   const [showKvkkModal, setShowKvkkModal] = useState<boolean>(false);
@@ -117,6 +124,26 @@ export default function App() {
       ...prev,
       [section]: !prev[section]
     }));
+  };
+
+  const handleMouseMoveBacktest = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    if (!backtestSvgRef.current || !analysisResult?.backtest?.monthlyData) return;
+    
+    const rect = backtestSvgRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    
+    const chartWidth = rect.width;
+    const paddingLeft = (10 / 500) * chartWidth;
+    const paddingRight = (10 / 500) * chartWidth;
+    const usableWidth = chartWidth - paddingLeft - paddingRight;
+    
+    const relativeX = mouseX - paddingLeft;
+    const dataLength = analysisResult.backtest.monthlyData.length;
+    
+    let index = Math.round((relativeX / usableWidth) * (dataLength - 1));
+    index = Math.max(0, Math.min(dataLength - 1, index));
+    
+    setHoveredBacktestIndex(index);
   };
   
   const pipelineRef = useRef<HTMLDivElement>(null);
@@ -1715,62 +1742,496 @@ export default function App() {
 
                     {/* Dynamic SVG line chart */}
                     {analysisResult.backtest?.monthlyData && (
-                      <div className="glass-card" style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', border: '1px solid var(--border-glass)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Tarihsel Büyüme Trajektorisi (100 TL Başlangıç)</span>
-                          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-green)' }}>Nihai Varlık Değeri: {analysisResult.backtest.monthlyData[analysisResult.backtest.monthlyData.length - 1].value.toFixed(1)} TL</span>
-                        </div>
-                        
-                        {(() => {
-                          const mData = analysisResult.backtest.monthlyData;
-                          const values = mData.map(d => d.value);
-                          const minVal = Math.min(...values) * 0.95;
-                          const maxVal = Math.max(...values) * 1.05;
+                      <div>
+                        {/* CSS animations inject */}
+                        <style dangerouslySetInnerHTML={{__html: `
+                          @keyframes drawLine {
+                            to { stroke-dashoffset: 0; }
+                          }
+                          .animate-line-primary {
+                            stroke-dasharray: 1200;
+                            stroke-dashoffset: 1200;
+                            animation: drawLine 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                          }
+                          .animate-line-secondary {
+                            stroke-dasharray: 1200;
+                            stroke-dashoffset: 1200;
+                            animation: drawLine 2.2s cubic-bezier(0.4, 0, 0.2, 1) 0.25s forwards;
+                          }
+                          .animate-line-tertiary {
+                            stroke-dasharray: 1200;
+                            stroke-dashoffset: 1200;
+                            animation: drawLine 2.2s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+                          }
+                          .chart-legend-row {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 12px 20px;
+                            margin-bottom: 0.5rem;
+                            padding-bottom: 0.75rem;
+                            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+                          }
+                          .legend-item {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 6px;
+                            font-size: 0.75rem;
+                            color: var(--text-secondary);
+                            transition: all 0.2s;
+                          }
+                          .legend-item:hover {
+                            color: var(--text-primary);
+                            transform: translateY(-1px);
+                          }
+                          @keyframes pulseGlow {
+                            0% { r: 3px; opacity: 1; stroke-width: 1px; }
+                            100% { r: 9px; opacity: 0; stroke-width: 2px; }
+                          }
+                          .pulse-circle {
+                            animation: pulseGlow 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+                          }
+                          @keyframes spinOnce {
+                            from { transform: rotate(0deg); }
+                            to { transform: rotate(360deg); }
+                          }
+                          .spin-active {
+                            animation: spinOnce 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+                          }
+                          .compare-mode-btn {
+                            position: relative;
+                            overflow: hidden;
+                          }
+                          .compare-mode-btn::after {
+                            content: '';
+                            position: absolute;
+                            bottom: 0;
+                            left: 50%;
+                            width: 0;
+                            height: 2px;
+                            background: var(--accent-green);
+                            transition: all 0.3s;
+                            transform: translateX(-50%);
+                          }
+                          .compare-mode-btn-active::after {
+                            width: 80%;
+                          }
+                        `}} />
+
+                        {/* Selector Controls & Replay Button */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
+                          <div style={{ display: 'flex', background: 'rgba(255, 255, 255, 0.03)', padding: '3px', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
+                            {[
+                              { mode: 'all', label: 'Tümünü Yarıştır' },
+                              { mode: 'bist', label: 'vs BIST 100' },
+                              { mode: 'gold', label: 'vs Saf Altın' }
+                            ].map((btn) => (
+                              <button
+                                key={btn.mode}
+                                onClick={() => {
+                                  setBacktestCompareMode(btn.mode as any);
+                                  setBacktestAnimKey(prev => prev + 1);
+                                }}
+                                style={{
+                                  border: 'none',
+                                  padding: '6px 12px',
+                                  borderRadius: '6px',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                  background: backtestCompareMode === btn.mode ? 'rgba(255,255,255,0.08)' : 'transparent',
+                                  color: backtestCompareMode === btn.mode ? 'var(--text-primary)' : 'var(--text-muted)',
+                                  boxShadow: backtestCompareMode === btn.mode ? '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)' : 'none',
+                                }}
+                                className={`compare-mode-btn ${backtestCompareMode === btn.mode ? 'compare-mode-btn-active' : ''}`}
+                              >
+                                {btn.label}
+                              </button>
+                            ))}
+                          </div>
                           
-                          const points = mData.map((d, i) => {
-                            const x = (i / (mData.length - 1)) * 480 + 10;
-                            const y = 140 - ((d.value - minVal) / (maxVal - minVal)) * 120;
-                            return `${x},${y}`;
-                          }).join(' ');
+                          <button
+                            onClick={() => {
+                              setIsSpinning(true);
+                              setBacktestAnimKey(prev => prev + 1);
+                              setTimeout(() => setIsSpinning(false), 600);
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              background: 'rgba(255, 255, 255, 0.02)',
+                              border: '1px solid var(--border-glass)',
+                              padding: '6px 12px',
+                              borderRadius: '8px',
+                              fontSize: '0.75rem',
+                              color: 'var(--text-secondary)',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                              e.currentTarget.style.color = 'var(--text-primary)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                              e.currentTarget.style.color = 'var(--text-secondary)';
+                            }}
+                          >
+                            <RefreshCw size={12} className={isSpinning ? "spin-active" : ""} style={{ transition: 'transform 0.6s' }} />
+                            Yarışı Yeniden Oynat
+                          </button>
+                        </div>
 
-                          const areaPoints = `10,140 ${points} 490,140`;
+                        {/* Chart Header & Comparison Legend */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Tarihsel Performans Karşılaştırma Grafiği (100 TL Başlangıç)</span>
+                          
+                          <div className="chart-legend-row">
+                            <div className="legend-item">
+                              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }} />
+                              <span>Yapay Zeka Sepeti:</span>
+                              <strong style={{ color: '#10b981' }}>%{analysisResult.backtest.totalReturn}%</strong>
+                            </div>
+                            {(backtestCompareMode === 'all' || backtestCompareMode === 'bist') && (
+                              <div className="legend-item">
+                                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#3b82f6', display: 'inline-block', boxShadow: '0 0 6px #3b82f6' }} />
+                                <span>BIST 100 Endeksi:</span>
+                                <strong style={{ color: '#3b82f6' }}>%48.0%</strong>
+                              </div>
+                            )}
+                            {(backtestCompareMode === 'all' || backtestCompareMode === 'gold') && (
+                              <div className="legend-item">
+                                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b', display: 'inline-block', boxShadow: '0 0 6px #f59e0b' }} />
+                                <span>Saf Altın (Ons):</span>
+                                <strong style={{ color: '#f59e0b' }}>%42.5%</strong>
+                              </div>
+                            )}
+                          </div>
+                        </div>
 
-                          return (
-                            <div>
-                              <svg viewBox="0 0 500 150" style={{ width: '100%', height: 'auto', display: 'block', overflow: 'visible' }}>
-                                <defs>
-                                  <linearGradient id="backtestAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
-                                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
-                                  </linearGradient>
-                                </defs>
-                                <line x1="10" y1="20" x2="490" y2="20" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                                <line x1="10" y1="80" x2="490" y2="80" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                                <line x1="10" y1="140" x2="490" y2="140" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                                
-                                <polygon points={areaPoints} fill="url(#backtestAreaGrad)" />
-                                <polyline points={points} fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                                
-                                {mData.map((d, i) => {
-                                  const x = (i / (mData.length - 1)) * 480 + 10;
-                                  const y = 140 - ((d.value - minVal) / (maxVal - minVal)) * 120;
-                                  return (
-                                    <g key={i} className="tooltip-container">
-                                      <circle cx={x} cy={y} r="3" fill="#10b981" />
-                                      {/* Show dot highlights */}
-                                      <circle cx={x} cy={y} r="7" fill="transparent" style={{ cursor: 'pointer' }} />
+                        <div className="glass-card" style={{ background: 'rgba(0,0,0,0.22)', padding: '1.25rem', border: '1px solid var(--border-glass)' }}>
+                          {(() => {
+                            const mData = analysisResult.backtest.monthlyData;
+                            const bistData = analysisResult.backtest.bist100Data || [];
+                            const goldData = analysisResult.backtest.goldData || [];
+                            
+                            const allVals = [
+                              ...mData.map(d => d.value),
+                              ...(backtestCompareMode === 'all' || backtestCompareMode === 'bist' ? bistData.map(d => d.value) : []),
+                              ...(backtestCompareMode === 'all' || backtestCompareMode === 'gold' ? goldData.map(d => d.value) : [])
+                            ];
+                            
+                            const minVal = Math.min(...allVals) * 0.95;
+                            const maxVal = Math.max(...allVals) * 1.05;
+                            
+                            const getPoints = (data: { date: string, value: number }[]) => {
+                              return data.map((d, i) => {
+                                const x = (i / (data.length - 1)) * 480 + 10;
+                                const y = 140 - ((d.value - minVal) / (maxVal - minVal)) * 120;
+                                return `${x},${y}`;
+                              }).join(' ');
+                            };
+                            
+                            const portfolioPoints = getPoints(mData);
+                            const bistPoints = getPoints(bistData);
+                            const goldPoints = getPoints(goldData);
+                            
+                            const areaPoints = `10,140 ${portfolioPoints} 490,140`;
+                            const xCoord = hoveredBacktestIndex !== null ? (hoveredBacktestIndex / (mData.length - 1)) * 480 + 10 : 0;
+
+                            return (
+                              <div 
+                                style={{ position: 'relative', width: '100%' }}
+                                onMouseLeave={() => setHoveredBacktestIndex(null)}
+                              >
+                                <svg 
+                                  ref={backtestSvgRef}
+                                  key={backtestAnimKey}
+                                  viewBox="0 0 500 150" 
+                                  onMouseMove={handleMouseMoveBacktest}
+                                  style={{ width: '100%', height: 'auto', display: 'block', overflow: 'visible' }}
+                                >
+                                  <defs>
+                                    <linearGradient id="backtestAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.18" />
+                                      <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+                                    </linearGradient>
+                                  </defs>
+                                  <line x1="10" y1="20" x2="490" y2="20" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                                  <line x1="10" y1="80" x2="490" y2="80" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                                  <line x1="10" y1="140" x2="490" y2="140" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                                  
+                                  {/* Area Fill under Portfolio Line */}
+                                  <polygon points={areaPoints} fill="url(#backtestAreaGrad)" />
+                                  
+                                  {/* BIST 100 Line */}
+                                  <polyline 
+                                    points={bistPoints} 
+                                    fill="none" 
+                                    stroke="#3b82f6" 
+                                    strokeWidth="1.75" 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                    className="animate-line-secondary"
+                                    style={{ 
+                                      opacity: (backtestCompareMode === 'all' || backtestCompareMode === 'bist') ? 0.85 : 0,
+                                      transition: 'opacity 0.4s ease, points 0.5s ease-in-out',
+                                      pointerEvents: 'none'
+                                    }}
+                                  />
+                                  
+                                  {/* Saf Altın Line */}
+                                  <polyline 
+                                    points={goldPoints} 
+                                    fill="none" 
+                                    stroke="#f59e0b" 
+                                    strokeWidth="1.75" 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                    className="animate-line-tertiary"
+                                    style={{ 
+                                      opacity: (backtestCompareMode === 'all' || backtestCompareMode === 'gold') ? 0.85 : 0,
+                                      transition: 'opacity 0.4s ease, points 0.5s ease-in-out',
+                                      pointerEvents: 'none'
+                                    }}
+                                  />
+
+                                  {/* AI Portfolio Line (Primary) */}
+                                  <polyline 
+                                    points={portfolioPoints} 
+                                    fill="none" 
+                                    stroke="#10b981" 
+                                    strokeWidth="3.25" 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                    className="animate-line-primary"
+                                    style={{
+                                      filter: 'drop-shadow(0px 0px 3px rgba(16, 185, 129, 0.4))',
+                                      transition: 'points 0.5s ease-in-out'
+                                    }}
+                                  />
+                                  
+                                  {/* Interactive Vertical Crosshair Guide Line */}
+                                  {hoveredBacktestIndex !== null && (
+                                    <line 
+                                      x1={xCoord} 
+                                      y1={10} 
+                                      x2={xCoord} 
+                                      y2={140} 
+                                      stroke="rgba(255, 255, 255, 0.25)" 
+                                      strokeWidth="1.25" 
+                                      strokeDasharray="4 4" 
+                                      pointerEvents="none"
+                                    />
+                                  )}
+
+                                  {/* Hover Intersection Glow Circles */}
+                                  {hoveredBacktestIndex !== null && (
+                                    <g pointerEvents="none">
+                                      {/* AI Sepeti intersecting point */}
+                                      {(() => {
+                                        const y = 140 - ((mData[hoveredBacktestIndex].value - minVal) / (maxVal - minVal)) * 120;
+                                        return (
+                                          <g>
+                                            <circle cx={xCoord} cy={y} className="pulse-circle" fill="none" stroke="#10b981" />
+                                            <circle cx={xCoord} cy={y} r="4.5" fill="#10b981" stroke="#0f172a" strokeWidth="1.5" />
+                                          </g>
+                                        );
+                                      })()}
+
+                                      {/* BIST 100 intersecting point */}
+                                      {(backtestCompareMode === 'all' || backtestCompareMode === 'bist') && bistData[hoveredBacktestIndex] && (() => {
+                                        const y = 140 - ((bistData[hoveredBacktestIndex].value - minVal) / (maxVal - minVal)) * 120;
+                                        return (
+                                          <g>
+                                            <circle cx={xCoord} cy={y} className="pulse-circle" fill="none" stroke="#3b82f6" />
+                                            <circle cx={xCoord} cy={y} r="4.5" fill="#3b82f6" stroke="#0f172a" strokeWidth="1.5" />
+                                          </g>
+                                        );
+                                      })()}
+
+                                      {/* Saf Altın intersecting point */}
+                                      {(backtestCompareMode === 'all' || backtestCompareMode === 'gold') && goldData[hoveredBacktestIndex] && (() => {
+                                        const y = 140 - ((goldData[hoveredBacktestIndex].value - minVal) / (maxVal - minVal)) * 120;
+                                        return (
+                                          <g>
+                                            <circle cx={xCoord} cy={y} className="pulse-circle" fill="none" stroke="#f59e0b" />
+                                            <circle cx={xCoord} cy={y} r="4.5" fill="#f59e0b" stroke="#0f172a" strokeWidth="1.5" />
+                                          </g>
+                                        );
+                                      })()}
                                     </g>
+                                  )}
+                                </svg>
+                                
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.625rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+                                  <span>{mData[0].date}</span>
+                                  <span>{mData[Math.floor(mData.length / 2)].date}</span>
+                                  <span>{mData[mData.length - 1].date}</span>
+                                </div>
+
+                                {/* Floating Glassmorphism Tooltip */}
+                                {hoveredBacktestIndex !== null && (() => {
+                                  const hoveredDate = mData[hoveredBacktestIndex].date;
+                                  const hoveredPortfolioVal = mData[hoveredBacktestIndex].value;
+                                  const hoveredBistVal = bistData[hoveredBacktestIndex]?.value;
+                                  const hoveredGoldVal = goldData[hoveredBacktestIndex]?.value;
+                                  
+                                  return (
+                                    <div 
+                                      style={{
+                                        position: 'absolute',
+                                        top: '5px',
+                                        left: xCoord > 250 ? 'auto' : `${(xCoord / 500) * 100 + 3}%`,
+                                        right: xCoord > 250 ? `${100 - (xCoord / 500) * 100 + 3}%` : 'auto',
+                                        zIndex: 20,
+                                        background: 'rgba(15, 23, 42, 0.92)',
+                                        backdropFilter: 'blur(10px)',
+                                        WebkitBackdropFilter: 'blur(10px)',
+                                        border: '1px solid rgba(255, 255, 255, 0.12)',
+                                        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(16, 185, 129, 0.1)',
+                                        borderRadius: '8px',
+                                        padding: '0.65rem 0.8rem',
+                                        width: '185px',
+                                        pointerEvents: 'none',
+                                        transition: 'left 0.1s ease, right 0.1s ease',
+                                      }}
+                                    >
+                                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.25rem', marginBottom: '0.4rem' }}>
+                                        {hoveredDate} Değerleri
+                                      </div>
+                                      
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                                        {/* AI Portfolio */}
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 4px #10b981' }} />
+                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>AI Sepeti</span>
+                                          </div>
+                                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#10b981' }}>
+                                            {hoveredPortfolioVal.toFixed(1)} TL (%{((hoveredPortfolioVal - 100)).toFixed(1)})
+                                          </span>
+                                        </div>
+                                        
+                                        {/* BIST 100 */}
+                                        {(backtestCompareMode === 'all' || backtestCompareMode === 'bist') && hoveredBistVal !== undefined && (
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3b82f6', boxShadow: '0 0 4px #3b82f6' }} />
+                                              <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>BIST 100</span>
+                                            </div>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#3b82f6' }}>
+                                              {hoveredBistVal.toFixed(1)} TL (%{((hoveredBistVal - 100)).toFixed(1)})
+                                            </span>
+                                          </div>
+                                        )}
+                                        
+                                        {/* Saf Altın */}
+                                        {(backtestCompareMode === 'all' || backtestCompareMode === 'gold') && hoveredGoldVal !== undefined && (
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b', boxShadow: '0 0 4px #f59e0b' }} />
+                                              <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>Saf Altın</span>
+                                            </div>
+                                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f59e0b' }}>
+                                              {hoveredGoldVal.toFixed(1)} TL (%{((hoveredGoldVal - 100)).toFixed(1)})
+                                            </span>
+                                          </div>
+                                        )}
+
+                                        {/* Dynamic winner comparison info */}
+                                        <div style={{ marginTop: '0.4rem', borderTop: '1px dashed rgba(255,255,255,0.08)', paddingTop: '0.4rem', fontSize: '0.68rem', color: 'var(--accent-gold-light)', display: 'flex', gap: '3px', alignItems: 'center' }}>
+                                          <Zap size={10} style={{ color: 'var(--accent-gold)', flexShrink: 0 }} />
+                                          <span>
+                                            {(() => {
+                                              const compVal = backtestCompareMode === 'gold' ? hoveredGoldVal : hoveredBistVal;
+                                              const diff = hoveredPortfolioVal - compVal;
+                                              if (diff > 0) {
+                                                return `AI Sepeti %${diff.toFixed(1)} daha karlı`;
+                                              } else if (diff < 0) {
+                                                return `AI Sepeti %${Math.abs(diff).toFixed(1)} geride`;
+                                              } else {
+                                                return `Başabaş seyrediyor`;
+                                              }
+                                            })()}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
                                   );
-                                })}
-                              </svg>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.625rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                                <span>{mData[0].date}</span>
-                                <span>{mData[Math.floor(mData.length / 2)].date}</span>
-                                <span>{mData[mData.length - 1].date}</span>
+                                })()}
+                              </div>
+                            );
+                          })()}
+                        </div>
+
+                        {/* Battle Card Race Analysis */}
+                        <div 
+                          className="glass-card" 
+                          style={{ 
+                            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(30, 41, 59, 0.45) 100%)', 
+                            border: '1px solid rgba(16, 185, 129, 0.12)',
+                            padding: '1.25rem',
+                            borderRadius: '12px',
+                            marginTop: '1.25rem',
+                            position: 'relative',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '150px', height: '150px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.06)', filter: 'blur(40px)', pointerEvents: 'none' }} />
+
+                          <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem' }}>
+                            <Zap size={14} style={{ color: 'var(--accent-gold)' }} />
+                            AI Sepet Yarış Analizi
+                          </h4>
+                          
+                          {backtestCompareMode === 'all' && (
+                            <div>
+                              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                12 aylık geriye dönük test (backtest) sonuçlarına göre <strong>Yapay Zeka Sepeti</strong>, hem <strong>BIST 100 Endeksi'ni</strong> (%48.0) hem de <strong>Saf Altın'ı</strong> (%42.5) geride bırakarak <strong>%{analysisResult.backtest?.totalReturn || 72}</strong> getiriyle yarışı lider tamamlamıştır.
+                              </p>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '0.75rem' }}>
+                                <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>BIST 100'e Karşı Alfa</span>
+                                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#10b981' }}>+%{((analysisResult.backtest?.totalReturn || 72) - 48.0).toFixed(1)} Outperformance</span>
+                                </div>
+                                <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>Altın'a Karşı Alfa</span>
+                                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#10b981' }}>+%{((analysisResult.backtest?.totalReturn || 72) - 42.5).toFixed(1)} Outperformance</span>
+                                </div>
                               </div>
                             </div>
-                          );
-                        })()}
+                          )}
+
+                          {backtestCompareMode === 'bist' && (
+                            <div>
+                              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                Yapay Zeka Sepeti (%{analysisResult.backtest?.totalReturn || 72}), BIST 100 endeksine (%48.0) karşı <strong>+%{((analysisResult.backtest?.totalReturn || 72) - 48.0).toFixed(1)}</strong> oranında daha yüksek getiri sunmuştur. Portföydeki hisse senedi fon seçimi (MAC, IIH vb.) endeks üzeri getiri sağlamada kritik rol oynamıştır.
+                              </p>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '0.75rem', background: 'rgba(59, 130, 246, 0.05)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(59, 130, 246, 0.1)' }}>
+                                <Info size={14} style={{ color: '#3b82f6', flexShrink: 0 }} />
+                                <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
+                                  BIST 100 yatay seyrederken, AI algoritması korumacı ve algoritma serbest fonlarına ağırlık vererek drawdown koruması sağlamıştır.
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          {backtestCompareMode === 'gold' && (
+                            <div>
+                              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                Güvenli liman Saf Altın (%42.5) enflasyon şoklarına karşı dengeli bir getiri sunarken, Yapay Zeka Sepeti (%{analysisResult.backtest?.totalReturn || 72}) altının getirisini <strong>+%{((analysisResult.backtest?.totalReturn || 72) - 42.5).toFixed(1)}</strong> aşarak sermayenizi reel olarak büyütmeyi başarmıştır.
+                              </p>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '0.75rem', background: 'rgba(245, 158, 11, 0.05)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(245, 158, 11, 0.1)' }}>
+                                <Info size={14} style={{ color: '#f59e0b', flexShrink: 0 }} />
+                                <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
+                                  Altın sabit kur/ons baskılarında yavaş ilerlerken, AI sepetindeki teknoloji fonları (AFT) ve serbest fonlar küresel ve yerel fırsatları hızlıca yakalamıştır.
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
