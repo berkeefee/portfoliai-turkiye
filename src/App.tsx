@@ -41,6 +41,42 @@ const PRESET_FUNDS = [
   { code: 'YAS', name: 'Yapı Kredi Koç Holding İştirakleri Hisse Fonu' }
 ];
 
+const getConicGradient = (assetAllocation: Record<string, number>) => {
+  const colors = [
+    'var(--accent-gold)', 
+    'var(--accent-gold-light)', 
+    'var(--accent-green)', 
+    '#f97316', 
+    'var(--accent-blue)',
+    '#a855f7',
+    '#ec4899',
+    '#0ea5e9',
+    '#10b981',
+    '#ef4444'
+  ];
+  
+  let cumulative = 0;
+  const parts: string[] = [];
+  
+  Object.entries(assetAllocation).forEach(([_, pct], idx) => {
+    if (pct <= 0) return;
+    const start = cumulative;
+    cumulative += pct;
+    const end = cumulative;
+    const color = colors[idx % colors.length];
+    parts.push(`${color} ${start.toFixed(1)}% ${end.toFixed(1)}%`);
+  });
+  
+  if (parts.length === 0) return 'rgba(255, 255, 255, 0.1)';
+  
+  // Ensure the gradient goes exactly to 100% or fill the rest if there's any rounding issue
+  if (cumulative < 100) {
+    parts.push(`rgba(255, 255, 255, 0.05) ${cumulative.toFixed(1)}% 100%`);
+  }
+  
+  return `conic-gradient(${parts.join(', ')})`;
+};
+
 export default function App() {
   // -------------------------------------------------------------
   // State Variables
@@ -1354,9 +1390,68 @@ export default function App() {
                               <div className="rebalance-bar-fill" style={{ height: '100%', width: `${item.weight}%`, backgroundColor: 'var(--accent-gold)', borderRadius: '2px' }} />
                             </div>
                             {fData && (
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)', borderBottom: '1px solid rgba(255, 255, 255, 0.03)', paddingBottom: '4px' }}>
                                 <span>Kategori: {fData.category}</span>
                                 <span>TEFAS Risk Değeri: {fData.risk_metrics.risk_value || 5}/7</span>
+                              </div>
+                            )}
+                            
+                            {fData && fData.asset_allocation && (
+                              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginTop: '4px', background: 'rgba(0,0,0,0.1)', padding: '6px 10px', borderRadius: '2px' }}>
+                                {/* Donut Chart */}
+                                <div style={{
+                                  position: 'relative',
+                                  width: '38px',
+                                  height: '38px',
+                                  borderRadius: '50%',
+                                  background: getConicGradient(fData.asset_allocation),
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0,
+                                  boxShadow: '0 1px 4px rgba(0,0,0,0.4)'
+                                }}>
+                                  <div style={{
+                                    width: '24px',
+                                    height: '24px',
+                                    borderRadius: '50%',
+                                    background: '#1a1c23', // Matches parent glass-card dark theme
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '0.55rem',
+                                    fontWeight: 800,
+                                    color: 'var(--text-muted)'
+                                  }}>
+                                    %
+                                  </div>
+                                </div>
+                                
+                                {/* Legend */}
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 10px', flex: 1 }}>
+                                  {Object.entries(fData.asset_allocation).map(([asset, pct], idx) => {
+                                    const colors = [
+                                      'var(--accent-gold)', 
+                                      'var(--accent-gold-light)', 
+                                      'var(--accent-green)', 
+                                      '#f97316', 
+                                      'var(--accent-blue)',
+                                      '#a855f7',
+                                      '#ec4899',
+                                      '#0ea5e9',
+                                      '#10b981',
+                                      '#ef4444'
+                                    ];
+                                    const color = colors[idx % colors.length];
+                                    return (
+                                      <div key={asset} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.675rem' }}>
+                                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: color, display: 'inline-block' }} />
+                                        <span style={{ color: 'var(--text-secondary)' }}>{asset}:</span>
+                                        <strong style={{ color: 'var(--text-primary)' }}>%{pct.toFixed(0)}</strong>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
                               </div>
                             )}
                           </div>
