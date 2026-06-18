@@ -1532,7 +1532,7 @@ export default function App() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', ...({ '@media (min-width: 768px)': { gridTemplateColumns: '1fr 2fr' } } as any) }} className="health-grid-1">
                     
                     {/* SVG Health Gauge */}
-                    <div className="glass-card" style={{ background: 'rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1.25rem', textAlign: 'center' }}>
+                    <div className="glass-card" style={{ background: 'rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '1.25rem', textAlign: 'center', height: 'fit-content' }}>
                       <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '1rem', textTransform: 'uppercase' }}>Portföy Genel Sağlık Skoru</h4>
                       
                       <div className="gauge-container" style={{ position: 'relative', width: '150px', height: '100px', display: 'flex', justifyContent: 'center' }}>
