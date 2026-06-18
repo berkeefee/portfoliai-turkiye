@@ -102,6 +102,7 @@ export default function App() {
   const [activeResultTab, setActiveResultTab] = useState<'tab-saglik-karnesi' | 'tab-risk-stres' | 'tab-fon-iliskileri' | 'tab-backtest-tahmin' | 'tab-ai-analist' | 'tab-premium'>('tab-saglik-karnesi');
   const [activeAuditorQuestion, setActiveAuditorQuestion] = useState<number | null>(null);
   const [premiumAlertConfig, setPremiumAlertConfig] = useState({ email: '', sms: '', volatilityAlert: true, drawdownAlert: true });
+  const [hoveredAssetClass, setHoveredAssetClass] = useState<string | null>(null);
   
   // Backtest comparison states
   const [backtestCompareMode, setBacktestCompareMode] = useState<'all' | 'bist' | 'gold'>('all');
@@ -1677,40 +1678,197 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Asset Allocation */}
-                  <div className="glass-card" style={{ background: 'rgba(0,0,0,0.1)' }}>
-                    <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Konsolide Varlık Sınıfı Dağılımı</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {analysisResult.data.reduce((acc: {name: string, val: number}[], fund) => {
-                        const p = analysisResult.portfolio.find(x => x.code === fund.fund_code);
-                        if (!p) return acc;
-                        Object.entries(fund.asset_allocation).forEach(([asset, pct]) => {
-                          const contrib = (pct * p.weight) / 100;
-                          const existing = acc.find(x => x.name === asset);
-                          if (existing) {
-                            existing.val += contrib;
-                          } else {
-                            acc.push({ name: asset, val: contrib });
-                          }
-                        });
-                        return acc;
-                      }, []).sort((a,b) => b.val - a.val).map((asset, i) => {
-                        const colors = ['var(--accent-gold)', 'var(--accent-gold-light)', 'var(--accent-green)', '#f97316', 'var(--accent-blue)'];
-                        const color = colors[i % colors.length];
-                        return (
-                          <div key={i} className="rebalance-bar-row">
-                            <div className="rebalance-bar-label" style={{ fontSize: '0.8rem' }}>
-                              <span>{asset.name}</span>
-                              <span style={{ fontWeight: 700 }}>%{asset.val.toFixed(1)}</span>
-                            </div>
-                            <div className="rebalance-bar-bg" style={{ height: '6px' }}>
-                              <div className="rebalance-bar-fill" style={{ width: `${asset.val}%`, backgroundColor: color }} />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                   {/* Asset Allocation */}
+                   <div className="glass-card" style={{ background: 'rgba(0,0,0,0.1)' }}>
+                     <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Konsolide Varlık Sınıfı Dağılımı</h3>
+                     
+                     {(() => {
+                       const consolidatedAllocation = analysisResult.data.reduce((acc: {name: string, val: number}[], fund) => {
+                         const p = analysisResult.portfolio.find(x => x.code === fund.fund_code);
+                         if (!p) return acc;
+                         Object.entries(fund.asset_allocation).forEach(([asset, pct]) => {
+                           const contrib = (pct * p.weight) / 100;
+                           const existing = acc.find(x => x.name === asset);
+                           if (existing) {
+                             existing.val += contrib;
+                           } else {
+                             acc.push({ name: asset, val: contrib });
+                           }
+                         });
+                         return acc;
+                       }, []).sort((a,b) => b.val - a.val);
+
+                       const totalAllocVal = consolidatedAllocation.reduce((sum, item) => sum + item.val, 0);
+                       const normalizedAlloc = consolidatedAllocation.map(item => ({
+                         name: item.name,
+                         val: totalAllocVal > 0 ? (item.val / totalAllocVal) * 100 : 0
+                       }));
+
+                       const assetColors: Record<string, string> = {
+                         'Yerli Hisse': 'var(--accent-gold)',
+                         'Yabancı Hisse': 'var(--accent-blue)',
+                         'Eurobond': 'var(--accent-green)',
+                         'BPP / Vadeli': 'var(--accent-purple)',
+                         'Para Piyasası': '#f97316',
+                         'Yatırım Fonları': '#ec4899',
+                         'Döviz': '#10b981',
+                         'Ters Repo': '#eab308',
+                         'Vadeli İşlem Teminatları': '#ef4444',
+                         'Diğer': '#6366f1'
+                       };
+                       const getAssetColor = (name: string, index: number) => {
+                         return assetColors[name] || ['var(--accent-gold)', 'var(--accent-blue)', 'var(--accent-green)', '#f97316', 'var(--accent-purple)', '#ec4899', '#6366f1'][index % 7];
+                       };
+
+                       const C = 2 * Math.PI * 38; // ~238.76
+                       let accumulatedPercent = 0;
+
+                       return (
+                         <div className="health-grid-2">
+                           {/* SVG Donut Chart Card */}
+                           <div className="glass-card" style={{ background: 'rgba(0,0,0,0.15)', padding: '1.25rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                             <div className="donut-layout-container" style={{ width: '100%' }}>
+                               <div style={{ position: 'relative', width: '160px', height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, margin: '0 auto' }}>
+                                 <svg width="100%" height="100%" viewBox="0 0 100 100">
+                                   {/* Background Circle */}
+                                   <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="6" />
+                                   
+                                   {/* Slices Group rotated to start from top */}
+                                   <g transform="rotate(-90 50 50)">
+                                     {normalizedAlloc.map((asset, idx) => {
+                                       const sliceLength = (asset.val / 100) * C;
+                                       const offset = - (accumulatedPercent / 100) * C;
+                                       accumulatedPercent += asset.val;
+                                       const isHovered = hoveredAssetClass === asset.name;
+                                       const isAnyHovered = hoveredAssetClass !== null;
+                                       const color = getAssetColor(asset.name, idx);
+
+                                       return (
+                                         <circle
+                                           key={idx}
+                                           cx="50"
+                                           cy="50"
+                                           r="38"
+                                           fill="none"
+                                           stroke={color}
+                                           strokeWidth={isHovered ? 9 : 6}
+                                           strokeDasharray={`${sliceLength} ${C}`}
+                                           strokeDashoffset={offset}
+                                           strokeLinecap={asset.val > 2 ? 'round' : 'butt'}
+                                           className="animate-donut"
+                                           style={{
+                                             transition: 'all 0.3s ease',
+                                             cursor: 'pointer',
+                                             opacity: isAnyHovered && !isHovered ? 0.35 : 1,
+                                             filter: isHovered ? `drop-shadow(0 0 8px ${color})` : 'none'
+                                           }}
+                                           onMouseEnter={() => setHoveredAssetClass(asset.name)}
+                                           onMouseLeave={() => setHoveredAssetClass(null)}
+                                         />
+                                       );
+                                     })}
+                                   </g>
+                                 </svg>
+
+                                 {/* Central Hole Info */}
+                                 <div style={{
+                                   position: 'absolute',
+                                   display: 'flex',
+                                   flexDirection: 'column',
+                                   alignItems: 'center',
+                                   justifyContent: 'center',
+                                   width: '74px',
+                                   height: '74px',
+                                   borderRadius: '50%',
+                                   background: '#090b0e',
+                                   boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.8), 0 0 12px rgba(197, 160, 89, 0.05)',
+                                   border: '1px solid rgba(255,255,255,0.03)',
+                                   padding: '4px',
+                                   textAlign: 'center'
+                                 }}>
+                                   {(() => {
+                                     const hoveredAsset = hoveredAssetClass ? normalizedAlloc.find(a => a.name === hoveredAssetClass) : null;
+                                     const color = hoveredAsset ? getAssetColor(hoveredAsset.name, normalizedAlloc.indexOf(hoveredAsset)) : 'var(--text-primary)';
+                                     return (
+                                       <>
+                                         <span style={{ 
+                                           fontSize: hoveredAsset ? '1.05rem' : '1.15rem', 
+                                           fontWeight: 800, 
+                                           color: color, 
+                                           textShadow: hoveredAsset ? `0 0 10px ${color}` : '0 0 10px rgba(255,255,255,0.1)',
+                                           transition: 'all 0.2s ease',
+                                           lineHeight: 1.1
+                                         }}>
+                                           {hoveredAsset ? `%${hoveredAsset.val.toFixed(0)}` : '%100'}
+                                         </span>
+                                         <span style={{ 
+                                           fontSize: '0.5rem', 
+                                           fontWeight: 700, 
+                                           color: 'var(--text-muted)', 
+                                           textTransform: 'uppercase', 
+                                           letterSpacing: '0.5px', 
+                                           marginTop: '3px',
+                                           display: 'block',
+                                           width: '64px',
+                                           whiteSpace: 'nowrap',
+                                           overflow: 'hidden',
+                                           textOverflow: 'ellipsis'
+                                         }}>
+                                           {hoveredAsset ? hoveredAsset.name : 'Dağılım'}
+                                         </span>
+                                       </>
+                                     );
+                                   })()}
+                                 </div>
+                               </div>
+                             </div>
+                           </div>
+
+                           {/* Legend Details Card */}
+                           <div className="glass-card" style={{ background: 'rgba(0,0,0,0.15)', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                               {normalizedAlloc.map((asset, idx) => {
+                                 const isHovered = hoveredAssetClass === asset.name;
+                                 const isAnyHovered = hoveredAssetClass !== null;
+                                 const color = getAssetColor(asset.name, idx);
+
+                                 return (
+                                   <div
+                                     key={idx}
+                                     style={{
+                                       display: 'flex',
+                                       alignItems: 'center',
+                                       justifyContent: 'space-between',
+                                       padding: '6px 8px',
+                                       borderRadius: '8px',
+                                       background: isHovered ? 'rgba(255,255,255,0.03)' : 'transparent',
+                                       border: isHovered ? '1px solid var(--border-glass-active)' : '1px solid transparent',
+                                       cursor: 'pointer',
+                                       transition: 'all 0.25s ease',
+                                       opacity: isAnyHovered && !isHovered ? 0.45 : 1
+                                     }}
+                                     onMouseEnter={() => setHoveredAssetClass(asset.name)}
+                                     onMouseLeave={() => setHoveredAssetClass(null)}
+                                   >
+                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                       <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: color, boxShadow: isHovered ? `0 0 6px ${color}` : 'none' }} />
+                                       <span style={{ fontSize: '0.8rem', fontWeight: isHovered ? 700 : 500, color: 'var(--text-primary)' }}>{asset.name}</span>
+                                     </div>
+                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                       <span style={{ fontSize: '0.8rem', fontWeight: 700, color: isHovered ? color : 'var(--text-secondary)' }}>%{asset.val.toFixed(1)}</span>
+                                       <div className="rebalance-bar-bg" style={{ width: '60px', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                                         <div className="rebalance-bar-fill" style={{ width: `${asset.val}%`, height: '100%', backgroundColor: color }} />
+                                       </div>
+                                     </div>
+                                   </div>
+                                 );
+                                })}
+                             </div>
+                           </div>
+                         </div>
+                       );
+                     })()}
+                   </div>
                 </div>
               )}
 

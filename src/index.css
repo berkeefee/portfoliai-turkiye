@@ -1660,3 +1660,58 @@ body {
   }
 }
 
+/* Premium Chart Animations */
+@keyframes drawCircle {
+  from { stroke-dasharray: 0 238.76; }
+}
+
+@keyframes drawFundCircle {
+  from { stroke-dasharray: 0 87.96; }
+}
+
+@keyframes fadeInArea {
+  from { opacity: 0; }
+  to { opacity: 0.18; }
+}
+
+.animate-donut {
+  animation: drawCircle 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fund-donut {
+  animation: drawFundCircle 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-area {
+  opacity: 0;
+  animation: fadeInArea 1.5s ease-out 1.5s forwards;
+}
+
+/* Health Grid Layouts */
+.health-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.donut-layout-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .health-grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 992px) {
+  .donut-layout-container {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+}
+
