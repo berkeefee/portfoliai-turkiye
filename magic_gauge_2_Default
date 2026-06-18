@@ -1,0 +1,12 @@
+import { Gauge } from "@/components/ui/gauge-1";
+
+export default function DefaultDemo() {
+  return (
+      <div className="flex gap-8 items-center justify-center">
+          <Gauge value={50} size="tiny" />
+          <Gauge value={50} size="small" />
+          <Gauge value={50} size="medium" />
+          <Gauge value={50} size="large" />
+      </div>
+  );
+}

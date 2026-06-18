@@ -14,7 +14,9 @@ import {
   Cpu,
   Database,
   Sliders,
-  Link
+  Link,
+  Home,
+  ArrowLeft
 } from 'lucide-react';
 import { 
   runLocalAnalysis, 
@@ -618,6 +620,26 @@ export default function App() {
           </div>
         </div>
         <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {analysisResult && (
+            <button
+              className="btn btn-accent"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '0.5rem 1rem',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                borderRadius: '8px',
+              }}
+              onClick={() => {
+                setAnalysisResult(null);
+                setActiveResultTab('tab-saglik-karnesi');
+              }}
+            >
+              <ArrowLeft size={14} /> Ana Sayfa
+            </button>
+          )}
           <a 
             href="https://x.com/caliskanborsa6" 
             target="_blank" 
