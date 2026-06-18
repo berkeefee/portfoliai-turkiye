@@ -1728,10 +1728,10 @@ export default function App() {
                            {/* SVG Donut Chart Card */}
                            <div className="glass-card" style={{ background: 'rgba(0,0,0,0.15)', padding: '1.25rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                              <div className="donut-layout-container" style={{ width: '100%' }}>
-                               <div style={{ position: 'relative', width: '160px', height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, margin: '0 auto' }}>
+                               <div style={{ position: 'relative', width: '210px', height: '210px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, margin: '0 auto' }}>
                                  <svg width="100%" height="100%" viewBox="0 0 100 100">
                                    {/* Background Circle */}
-                                   <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="6" />
+                                   <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="12" />
                                    
                                    {/* Slices Group rotated to start from top */}
                                    <g transform="rotate(-90 50 50)">
@@ -1751,7 +1751,7 @@ export default function App() {
                                            r="38"
                                            fill="none"
                                            stroke={color}
-                                           strokeWidth={isHovered ? 9 : 6}
+                                           strokeWidth={isHovered ? 16 : 12}
                                            strokeDasharray={`${sliceLength} ${C}`}
                                            strokeDashoffset={offset}
                                            strokeLinecap={asset.val > 2 ? 'round' : 'butt'}
@@ -1777,8 +1777,8 @@ export default function App() {
                                    flexDirection: 'column',
                                    alignItems: 'center',
                                    justifyContent: 'center',
-                                   width: '74px',
-                                   height: '74px',
+                                   width: '98px',
+                                   height: '98px',
                                    borderRadius: '50%',
                                    background: '#090b0e',
                                    boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.8), 0 0 12px rgba(197, 160, 89, 0.05)',
@@ -1792,7 +1792,7 @@ export default function App() {
                                      return (
                                        <>
                                          <span style={{ 
-                                           fontSize: hoveredAsset ? '1.05rem' : '1.15rem', 
+                                           fontSize: hoveredAsset ? '1.25rem' : '1.45rem', 
                                            fontWeight: 800, 
                                            color: color, 
                                            textShadow: hoveredAsset ? `0 0 10px ${color}` : '0 0 10px rgba(255,255,255,0.1)',
@@ -1802,14 +1802,14 @@ export default function App() {
                                            {hoveredAsset ? `%${hoveredAsset.val.toFixed(0)}` : '%100'}
                                          </span>
                                          <span style={{ 
-                                           fontSize: '0.5rem', 
+                                           fontSize: '0.65rem', 
                                            fontWeight: 700, 
                                            color: 'var(--text-muted)', 
                                            textTransform: 'uppercase', 
                                            letterSpacing: '0.5px', 
                                            marginTop: '3px',
                                            display: 'block',
-                                           width: '64px',
+                                           width: '88px',
                                            whiteSpace: 'nowrap',
                                            overflow: 'hidden',
                                            textOverflow: 'ellipsis'
