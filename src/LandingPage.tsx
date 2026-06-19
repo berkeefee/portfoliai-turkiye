@@ -238,43 +238,43 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
    ═══════════════════════════════════════════════ */
 export default function LandingPage() {
   const features = [
-    { icon: Calendar, title: 'Akıllı Randevu Yönetimi', desc: 'Müşterileriniz 7/24 online randevu alabilir. Çakışma kontrolü ve otomatik hatırlatmalar.' },
-    { icon: BarChart3, title: 'Gelir Analitikleri', desc: 'Günlük, haftalık ve aylık gelir raporlarınızı tek panelden takip edin.' },
-    { icon: MessageSquare, title: 'Müşteri İletişimi', desc: 'Entegre mesajlaşma ile müşterilerinizle doğrudan iletişim kurun.' },
-    { icon: Shield, title: 'Güvenli Altyapı', desc: 'Verileriniz SSL şifreleme ve kurumsal güvenlik standartlarıyla korunur.' },
-    { icon: Zap, title: 'Hızlı Kurulum', desc: '5 dakikada profilinizi oluşturun, hemen randevu almaya başlayın.' },
-    { icon: TrendingUp, title: 'Büyüme Araçları', desc: 'SEO optimize profil sayfası ve sosyal medya entegrasyonları.' },
+    { icon: BarChart3, title: 'Akıllı Sağlık Karnesi', desc: 'Portföyünüzün çeşitlendirme oranını, getiri potansiyelini ve genel sağlık durumunu anında puanlayın.' },
+    { icon: Shield, title: 'Risk & Stres Testleri', desc: 'Piyasadaki olası sert düşüş senaryolarında portföyünüzün ne kadar kayıp yaşayabileceğini simüle edin.' },
+    { icon: Sparkles, title: 'Yapay Zeka Analisti', desc: 'Gemini destekli multi-agent (çoklu ajan) yapısıyla portföyünüze özel gerekçeli analiz raporu alın.' },
+    { icon: Calendar, title: 'Kesişim (Overlap) Analizi', desc: 'Seçtiğiniz fonların alt kırılımlarındaki hisse yoğunlaşmalarını ve gizli risk ortaklıklarını bulun.' },
+    { icon: Zap, title: 'Makro Piyasa Uyumu', desc: 'Faiz, enflasyon ve piyasa momentum verilerine göre portföyünüzün uyumluluğunu ölçün.' },
+    { icon: TrendingUp, title: 'Gelişmiş Optimizasyon', desc: 'Maksimum verimlilik için AI tabanlı rebalans ve varlık dağılımı optimizasyonu uygulayın.' },
   ]
 
   const plans = [
-    { name: 'Başlangıç', price: '299', period: '/ay', desc: 'Kariyerine yeni başlayan ustalar için', features: ['Aylık 50 randevu', 'Temel analitikler', 'E-posta desteği', 'Profil sayfası'], popular: false },
-    { name: 'Profesyonel', price: '599', period: '/ay', desc: 'İşini büyütmek isteyen profesyoneller için', features: ['Sınırsız randevu', 'Gelişmiş analitikler', 'Öncelikli destek', 'Müşteri CRM', 'Otomatik hatırlatmalar', 'Özel profil sayfası'], popular: true },
-    { name: 'Kurumsal', price: '999', period: '/ay', desc: 'Ekip ve kurumsal hizmet sağlayıcılar için', features: ['Her şey dahil', 'Ekip yönetimi', 'API erişimi', 'Beyaz etiket', 'Özel entegrasyonlar', 'Dedicated destek'], popular: false },
+    { name: 'Başlangıç', price: '0', period: '', desc: 'Temel analiz ve risk profili oluşturmak için', features: ['Standart portföy analizi', 'Temel risk profili', 'Sağlık karnesi özeti', 'Gecikmeli TEFAS verileri'], popular: false },
+    { name: 'Profesyonel', price: '299', period: '/ay', desc: 'Bireysel yatırımcılar için gelişmiş araçlar', features: ['Sınırsız portföy analizi', 'Detaylı risk & stres testleri', 'Tam kesişim (overlap) taraması', 'Temel AI analist raporu', 'Gelişmiş rebalans önerileri'], popular: true },
+    { name: 'Premium (AI Canlı)', price: '699', period: '/ay', desc: 'Akıllı kararlar için tam canlı AI gücü', features: ['Her şey dahil', 'Gemini Multi-Agent Canlı Analiz', 'Anlık KAP/TEFAS entegrasyonu', 'Özelleştirilmiş piyasa uyarıları', 'Gelişmiş backtest simülasyonları', '7/24 öncelikli destek'], popular: false },
   ]
 
   const testimonials = [
-    { name: 'Ahmet Y.', role: 'Elektrik Ustası', text: 'Randevularımı artık tek yerden yönetiyorum. Müşteri memnuniyetim %40 arttı.', rating: 5 },
-    { name: 'Fatma K.', role: 'Güzellik Uzmanı', text: 'Müşterilerim 7/24 randevu alabiliyor. İş kaybım sıfıra indi.', rating: 5 },
-    { name: 'Mehmet D.', role: 'Tesisat Teknisyeni', text: 'Gelir raporları sayesinde hangi hizmetimin daha karlı olduğunu görebiliyorum.', rating: 5 },
-    { name: 'Ayşe B.', role: 'Terzi', text: "Profesyonel bir profil sayfam oldu. Google'dan yeni müşteriler geliyor.", rating: 4 },
-    { name: 'Can S.', role: 'Boyacı', text: 'Teknik bilgim yok ama 5 dakikada kurdum. Çok kolay kullanılıyor.', rating: 5 },
-    { name: 'Zeynep T.', role: 'Masör', text: 'Hatırlatma mesajları sayesinde randevu iptalleri %80 azaldı.', rating: 5 },
+    { name: 'Kaan G.', role: 'Bireysel Yatırımcı', text: 'Fonlarımın altındaki hisse kesişimlerini (overlap) Çalışkan Borsa sayesinde gördüm. Çok faydalı.', rating: 5 },
+    { name: 'Zeynep A.', role: 'Yatırım Danışmanı', text: 'Müşterilerimin risk profillerine uygun rebalans önerilerini hazırlarken bu aracı sıklıkla kullanıyorum.', rating: 5 },
+    { name: 'Murat Y.', role: 'Finansal Analist', text: 'TEFAS fonlarının makro piyasa rejimleriyle uyum analizini yapay zeka ile bu kadar hızlı sunan başka bir yer yok.', rating: 5 },
+    { name: 'Elif S.', role: 'Uzun Vadeli Yatırımcı', text: 'Stres testi simülasyonu sayesinde portföyümün piyasa çöküşlerindeki dayanıklılığını önceden görebiliyorum.', rating: 4 },
+    { name: 'Ahmet T.', role: 'Hisse Senedi Yatırımcısı', text: 'Fon dağılımındaki AI optimizasyonu sayesinde getirimi pazarın üzerine çıkarmayı başardım.', rating: 5 },
+    { name: 'Buse K.', role: 'Yeni Yatırımcı', text: 'Karışık finansal verileri yapay zeka raporuyla sade ve anlaşılır bir Türkçe ile sunması harika.', rating: 5 },
   ]
 
   const faqs = [
-    { q: 'Platforma nasıl kayıt olabilirim?', a: 'E-posta adresinizi girin, size gönderilen giriş linkine tıklayın ve profilinizi oluşturmaya başlayın.' },
-    { q: 'Hangi meslek grupları kullanabilir?', a: 'Ustalar, profesyoneller, teknisyenler ve hizmet sağlayıcılar dahil tüm bağımsız çalışanlar kullanabilir.' },
-    { q: 'Ödeme nasıl yapılır?', a: 'Kredi kartı, banka kartı veya havale/EFT ile ödeme yapabilirsiniz. Tüm ödemeler SSL ile güvence altındadır.' },
-    { q: 'İstediğim zaman iptal edebilir miyim?', a: 'Evet, herhangi bir taahhüt yoktur. Aboneliğinizi dilediğiniz zaman iptal edebilirsiniz.' },
-    { q: 'Müşterilerim nasıl randevu alacak?', a: 'Size özel profil sayfanızın linkini paylaşmanız yeterli.' },
-    { q: 'Teknik destek sağlıyor musunuz?', a: 'Evet, tüm planlarda e-posta desteği mevcuttur. Profesyonel ve Kurumsal planlarda öncelikli destek sunulmaktadır.' },
+    { q: 'Çalışkan Borsa nedir?', a: 'Çalışkan Borsa, TEFAS ve KAP verilerini kullanarak yatırım fonu portföylerinizi yapay zeka desteğiyle analiz eden, risk ve stres testleri uygulayan modern bir finansal analiz platformudur.' },
+    { q: 'Yapay Zeka Analisti nasıl çalışır?', a: 'Gemini tabanlı çoklu ajan (multi-agent) sistemimiz; portföyünüzün varlık dağılımını, fon kesişimlerini ve makro piyasa durumunu analiz ederek size özel detaylı bir yatırım ve rebalans raporu hazırlar.' },
+    { q: 'Platformu kullanmak için ücret ödemem gerekiyor mu?', a: 'Başlangıç planı tamamen ücretsizdir. Daha gelişmiş stres testleri, overlap analizi ve canlı yapay zeka ajan raporları için Profesyonel veya Premium planları tercih edebilirsiniz.' },
+    { q: 'Yatırım fonlarıma veya parama erişiminiz oluyor mu?', a: 'Hayır. Sadece girdiğiniz fon kodları ve ağırlıkları üzerinden matematiksel ve istatistical analizler yaparız. Herhangi bir para transferi veya portföy saklama işlemi gerçekleştirmiyoruz. Verileriniz tamamen güvendedir.' },
+    { q: 'Veriler güncel mi?', a: 'Platformumuz TEFAS ve KAP üzerinden çekilen en güncel fon dağılımları ve fiyat verileri ile çalışmaktadır.' },
+    { q: 'İstediğim zaman aboneliğimi iptal edebilir miyim?', a: 'Evet, herhangi bir taahhüt yoktur. Dilediğiniz an aboneliğinizi sonlandırabilirsiniz.' },
   ]
 
   const stats = [
-    { value: '10K+', label: 'Aktif Usta' },
-    { value: '500K+', label: 'Randevu' },
-    { value: '%99.9', label: 'Uptime' },
-    { value: '4.9/5', label: 'Memnuniyet' },
+    { value: '50K+', label: 'Analiz Edilen Portföy' },
+    { value: '250+', label: 'Aktif TEFAS Fonu' },
+    { value: '%99.9', label: 'Veri Doğruluğu' },
+    { value: '4.8/5', label: 'Kullanıcı Değerlendirmesi' },
   ]
 
   const sectionMaxWidth = { maxWidth: '72rem', margin: '0 auto' }
@@ -316,7 +316,7 @@ export default function LandingPage() {
             <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Sparkles style={{ width: '16px', height: '16px', color: '#fff' }} />
             </div>
-            <span style={{ fontSize: '1.125rem', fontWeight: 700 }}>PortfoliAI</span>
+            <span style={{ fontSize: '1.125rem', fontWeight: 700 }}>Çalışkan Borsa</span>
           </div>
           <div className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '2rem', fontSize: '0.875rem', color: '#a3a3a3' }}>
             {[['#ozellikler','Özellikler'],['#fiyatlandirma','Fiyatlandırma'],['#yorumlar','Yorumlar'],['#sss','S.S.S'],['#iletisim','İletişim']].map(([href, label]) => (
@@ -337,23 +337,23 @@ export default function LandingPage() {
 
           <motion.div variants={fadeUp} custom={0} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', marginBottom: '2rem', fontSize: '0.75rem', fontWeight: 500, background: 'rgba(99,102,241,0.1)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '9999px' }}>
             <Sparkles style={{ width: '14px', height: '14px' }} />
-            Ustalar, Profesyoneller, Teknisyenler ve Hizmet Sağlayıcılar İçin
+            Yapay Zeka Destekli Portföy Yönetimi
           </motion.div>
 
           <motion.h1 variants={fadeUp} custom={1} className="landing-hero-title" style={{ fontSize: '4rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, marginBottom: '1.5rem' }}>
-            İşinizi Dijitale{' '}
+            Yatırımlarınızı AI ile{' '}
             <span style={{ background: 'linear-gradient(to right, #818cf8, #a78bfa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Taşıyın
+              Optimize Edin
             </span>
           </motion.h1>
 
           <motion.p variants={fadeUp} custom={2} style={{ fontSize: '1.125rem', color: '#a3a3a3', maxWidth: '36rem', margin: '0 auto 2.5rem', lineHeight: 1.7 }}>
-            Randevu yönetimi, müşteri takibi ve gelir analitiklerini tek bir platformda birleştirin. Yapay zeka destekli araçlarla işinizi büyütün.
+            TEFAS ve KAP verileriyle entegre, risk odaklı ve yapay zeka destekli yatırım fonu portföy kurucu ve danışmanlık paneli.
           </motion.p>
 
           <motion.div variants={fadeUp} custom={3}>
             <MagicLinkForm variant="hero" />
-            <p style={{ marginTop: '16px', fontSize: '0.75rem', color: '#a3a3a3' }}>Şifre gerektirmez · 30 saniyede başlayın · Kredi kartı gerekmez</p>
+            <p style={{ marginTop: '16px', fontSize: '0.75rem', color: '#a3a3a3' }}>Şifre gerektirmez · Güvenli Magic Link · Anında Analiz</p>
           </motion.div>
 
           {/* Stats */}
@@ -370,9 +370,9 @@ export default function LandingPage() {
 
       {/* ─── PROOF / LOGOS SLIDER ─── */}
       <div style={{ padding: '3rem 0', borderTop: '1px solid rgba(38,38,38,0.5)', borderBottom: '1px solid rgba(38,38,38,0.5)' }}>
-        <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#a3a3a3', marginBottom: '2rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Güvenilir Teknoloji Altyapısı</p>
+        <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#a3a3a3', marginBottom: '2rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Desteklenen Altyapı & Veri Kaynakları</p>
         <InfiniteSlider speed={40}>
-          {['Next.js', 'Supabase', 'Vercel', 'Stripe', 'Resend', 'TailwindCSS', 'TypeScript', 'PostgreSQL'].map((t) => (
+          {['TEFAS', 'KAP', 'BIST', 'Gemini AI', 'Supabase', 'Vercel', 'TypeScript', 'React'].map((t) => (
             <span key={t} style={{ fontSize: '1.125rem', fontWeight: 600, color: '#262626', whiteSpace: 'nowrap', padding: '0 1rem' }}>{t}</span>
           ))}
         </InfiniteSlider>
@@ -383,8 +383,8 @@ export default function LandingPage() {
         <div style={sectionMaxWidth}>
           <motion.div variants={fadeUp} style={{ textAlign: 'center', marginBottom: '4rem' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#818cf8', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Özellikler</span>
-            <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginTop: '12px' }}>İşinizi Güçlendiren Araçlar</h2>
-            <p style={{ color: '#a3a3a3', marginTop: '1rem', maxWidth: '32rem', margin: '1rem auto 0', fontSize: '0.875rem' }}>Profesyonel hizmet sunumunuz için ihtiyacınız olan her şey tek platformda.</p>
+            <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginTop: '12px' }}>Portföyünüzü Optimize Eden Teknolojiler</h2>
+            <p style={{ color: '#a3a3a3', marginTop: '1rem', maxWidth: '32rem', margin: '1rem auto 0', fontSize: '0.875rem' }}>Yatırım fonlarınızı analiz etmek, riskleri yönetmek ve yapay zeka desteğiyle büyütmek için ihtiyacınız olan her şey.</p>
           </motion.div>
 
           <div className="landing-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }}>
@@ -456,7 +456,7 @@ export default function LandingPage() {
         <div style={sectionMaxWidth}>
           <motion.div variants={fadeUp} style={{ textAlign: 'center', marginBottom: '4rem' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#818cf8', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Yorumlar</span>
-            <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginTop: '12px' }}>Ustalarımız Ne Diyor?</h2>
+            <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginTop: '12px' }}>Yatırımcılarımızın Yorumları</h2>
           </motion.div>
 
           <div className="landing-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }}>
@@ -502,8 +502,8 @@ export default function LandingPage() {
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '500px', height: '300px', background: 'radial-gradient(ellipse, rgba(99,102,241,0.08), transparent 70%)', borderRadius: '50%', filter: 'blur(80px)', pointerEvents: 'none' }} />
           <motion.div variants={fadeUp}>
             <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#818cf8', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Hemen Başlayın</span>
-            <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginTop: '12px', marginBottom: '16px' }}>İşinizi Dijitale Taşımaya Hazır mısınız?</h2>
-            <p style={{ color: '#a3a3a3', fontSize: '0.875rem', marginBottom: '2.5rem' }}>E-posta adresinizi girin, size özel giriş linkini hemen gönderelim.</p>
+            <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginTop: '12px', marginBottom: '16px' }}>Yatırımlarınızı Optimize Etmeye Hazır mısınız?</h2>
+            <p style={{ color: '#a3a3a3', fontSize: '0.875rem', marginBottom: '2.5rem' }}>E-posta adresinizi girin, size özel giriş linkini anında e-postanıza gönderelim.</p>
           </motion.div>
           <motion.div variants={fadeUp} custom={1}>
             <MagicLinkForm variant="contact" />
@@ -518,14 +518,14 @@ export default function LandingPage() {
             <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Sparkles style={{ width: '14px', height: '14px', color: '#fff' }} />
             </div>
-            <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>PortfoliAI</span>
+            <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>Çalışkan Borsa</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', fontSize: '0.75rem', color: '#a3a3a3' }}>
             {[['#ozellikler','Özellikler'],['#fiyatlandirma','Fiyatlandırma'],['#sss','S.S.S'],['#iletisim','İletişim']].map(([href, label]) => (
               <a key={href} href={href} className="landing-nav-link" style={{ color: '#a3a3a3', textDecoration: 'none', transition: 'color 0.3s' }}>{label}</a>
             ))}
           </div>
-          <p style={{ fontSize: '0.75rem', color: '#a3a3a3' }}>© 2024 PortfoliAI. Tüm hakları saklıdır.</p>
+          <p style={{ fontSize: '0.75rem', color: '#a3a3a3' }}>© 2026 Çalışkan Borsa. Tüm hakları saklıdır.</p>
         </div>
       </footer>
     </div>
