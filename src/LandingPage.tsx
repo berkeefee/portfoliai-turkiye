@@ -85,7 +85,29 @@ function MagicLinkForm({ variant = 'hero' }: { variant?: 'hero' | 'contact' }) {
     } catch (err: any) {
       console.error('Auth error details:', err)
       setStatus('error')
-      setMessage(err?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.')
+      
+      let errMsg = 'Bir hata oluştu. Lütfen tekrar deneyin.';
+      if (err) {
+        if (typeof err === 'string') {
+          errMsg = err;
+        } else if (err.message) {
+          errMsg = typeof err.message === 'object' ? JSON.stringify(err.message) : String(err.message);
+        } else if (err.error_description) {
+          errMsg = err.error_description;
+        } else {
+          try {
+            errMsg = JSON.stringify(err);
+          } catch {
+            errMsg = String(err);
+          }
+        }
+      }
+      
+      if (!errMsg || errMsg === '{}') {
+        errMsg = 'Kimlik doğrulama hatası (Supabase panelindeki SMTP veya Email ayarlarınızı kontrol edin).';
+      }
+      
+      setMessage(errMsg)
     }
   }
 
