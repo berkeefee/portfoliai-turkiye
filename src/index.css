@@ -115,10 +115,13 @@ body {
 
 .brand-text h1 {
   font-family: var(--font-serif);
-  font-size: 1.55rem;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-  color: var(--accent-gold);
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--accent-gold-light), #f3dcb3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
 .brand-text p {

@@ -316,7 +316,7 @@ export default function LandingPage() {
             <div style={{ width: '54px', height: '54px', borderRadius: '50%', border: '1px solid rgba(197, 160, 89, 0.3)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(197, 160, 89, 0.05)', boxShadow: '0 0 10px rgba(197, 160, 89, 0.1)', flexShrink: 0 }}>
               <img src="/logo.png" alt="Çalışkan Borsa Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
-            <span style={{ fontSize: '1.125rem', fontWeight: 700 }}>Çalışkan Borsa</span>
+            <span style={{ fontSize: '1.25rem', fontWeight: 800, background: 'linear-gradient(135deg, #c5a059, #f3dcb3)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.02em' }}>Çalışkan Borsa</span>
           </div>
           <div className="landing-nav-links" style={{ display: 'flex', alignItems: 'center', gap: '2rem', fontSize: '0.875rem', color: '#a3a3a3' }}>
             {[['#ozellikler','Özellikler'],['#fiyatlandirma','Fiyatlandırma'],['#yorumlar','Yorumlar'],['#sss','S.S.S'],['#iletisim','İletişim']].map(([href, label]) => (
@@ -518,7 +518,7 @@ export default function LandingPage() {
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '1px solid rgba(197, 160, 89, 0.3)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(197, 160, 89, 0.05)', boxShadow: '0 0 10px rgba(197, 160, 89, 0.1)', flexShrink: 0 }}>
               <img src="/logo.png" alt="Çalışkan Borsa Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
-            <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>Çalışkan Borsa</span>
+            <span style={{ fontSize: '1rem', fontWeight: 800, background: 'linear-gradient(135deg, #c5a059, #f3dcb3)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.02em' }}>Çalışkan Borsa</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', fontSize: '0.75rem', color: '#a3a3a3' }}>
             {[['#ozellikler','Özellikler'],['#fiyatlandirma','Fiyatlandırma'],['#sss','S.S.S'],['#iletisim','İletişim']].map(([href, label]) => (
