@@ -16,7 +16,8 @@ import {
   Sliders,
   Link,
   Home,
-  ArrowLeft
+  ArrowLeft,
+  LogOut
 } from 'lucide-react';
 import { 
   runLocalAnalysis, 
@@ -28,6 +29,9 @@ import type {
   AgentSystemResult,
   AgentPortfolioItem
 } from './engine/agentEngine';
+import { supabase } from './supabaseClient';
+import LandingPage from './LandingPage';
+import type { User } from '@supabase/supabase-js';
 
 // Common fund codes for dropdown selection
 const PRESET_FUNDS = [
@@ -80,6 +84,56 @@ const getConicGradient = (assetAllocation: Record<string, number>) => {
 };
 
 export default function App() {
+  // -------------------------------------------------------------
+  // Auth State
+  // -------------------------------------------------------------
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    // Check current session
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setAuthLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setAuthLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Show loading screen while checking auth
+  if (authLoading) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ width: '40px', height: '40px', border: '3px solid rgba(99,102,241,0.2)', borderTop: '3px solid #6366f1', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
+          <p style={{ color: '#a3a3a3', fontSize: '0.875rem' }}>Yükleniyor...</p>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      </div>
+    );
+  }
+
+  // Show LandingPage if not authenticated
+  if (!user) {
+    return <LandingPage />;
+  }
+
+  // If authenticated, show dashboard (existing code below)
+  return <Dashboard user={user} />;
+}
+
+// Wrap existing dashboard in its own component
+function Dashboard({ user }: { user: User }) {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
   // -------------------------------------------------------------
   // State Variables
   // -------------------------------------------------------------
@@ -640,6 +694,25 @@ export default function App() {
               <ArrowLeft size={14} /> Ana Sayfa
             </button>
           )}
+          <button
+            className="btn btn-icon"
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid var(--border-glass-active)',
+              color: '#f87171',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+            onClick={handleLogout}
+            title="Çıkış Yap"
+          >
+            <LogOut size={14} />
+          </button>
           <a 
             href="https://x.com/caliskanborsa6" 
             target="_blank" 
