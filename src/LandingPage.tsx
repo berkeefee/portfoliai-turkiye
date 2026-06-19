@@ -82,9 +82,10 @@ function MagicLinkForm({ variant = 'hero' }: { variant?: 'hero' | 'contact' }) {
       setStatus('success')
       setMessage('Giriş linki e-posta adresinize gönderildi! Lütfen e-postanızı kontrol edin.')
       setEmail('')
-    } catch {
+    } catch (err: any) {
+      console.error('Auth error details:', err)
       setStatus('error')
-      setMessage('Bir hata oluştu. Lütfen tekrar deneyin.')
+      setMessage(err?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.')
     }
   }
 
