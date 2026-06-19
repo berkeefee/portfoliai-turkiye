@@ -29,7 +29,7 @@ import type {
   AgentSystemResult,
   AgentPortfolioItem
 } from './engine/agentEngine';
-import { supabase } from './supabaseClient';
+import { supabase, supabaseConfigured } from './supabaseClient';
 import LandingPage from './LandingPage';
 import type { User } from '@supabase/supabase-js';
 
@@ -88,12 +88,16 @@ export default function App() {
   // Auth State
   // -------------------------------------------------------------
   const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(supabaseConfigured);
 
   useEffect(() => {
+    if (!supabaseConfigured) return;
+
     // Check current session
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
+    supabase.auth.getUser().then(({ data: { user: u } }) => {
+      setUser(u);
+      setAuthLoading(false);
+    }).catch(() => {
       setAuthLoading(false);
     });
 
@@ -119,12 +123,12 @@ export default function App() {
     );
   }
 
-  // Show LandingPage if not authenticated
+  // Show LandingPage if not authenticated (or if Supabase is not configured)
   if (!user) {
     return <LandingPage />;
   }
 
-  // If authenticated, show dashboard (existing code below)
+  // If authenticated, show dashboard
   return <Dashboard user={user} />;
 }
 
