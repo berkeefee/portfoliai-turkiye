@@ -86,28 +86,20 @@ function MagicLinkForm({ variant = 'hero' }: { variant?: 'hero' | 'contact' }) {
       console.error('Auth error details:', err)
       setStatus('error')
       
-      let errMsg = 'Bir hata oluştu. Lütfen tekrar deneyin.';
-      if (err) {
-        if (typeof err === 'string') {
-          errMsg = err;
-        } else if (err.message) {
-          errMsg = typeof err.message === 'object' ? JSON.stringify(err.message) : String(err.message);
-        } else if (err.error_description) {
-          errMsg = err.error_description;
-        } else {
-          try {
-            errMsg = JSON.stringify(err);
-          } catch {
-            errMsg = String(err);
-          }
-        }
+      let debugMsg = '';
+      try {
+        // Enumerable properties stringified
+        debugMsg = JSON.stringify(err);
+      } catch {
+        debugMsg = String(err);
       }
       
-      if (!errMsg || errMsg === '{}') {
-        errMsg = 'Kimlik doğrulama hatası (Supabase panelindeki SMTP veya Email ayarlarınızı kontrol edin).';
+      // Handle cases where JSON.stringify returns "{}" due to non-enumerable properties of Error class
+      if ((debugMsg === '{}' || !debugMsg) && err) {
+        debugMsg = `Error: ${err.message || 'unknown'} | Status: ${err.status || 'unknown'} | Name: ${err.name || 'unknown'}`;
       }
       
-      setMessage(errMsg)
+      setMessage(`Sistem Hatası: ${debugMsg}`)
     }
   }
 
