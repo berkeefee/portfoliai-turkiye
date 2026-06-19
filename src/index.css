@@ -101,8 +101,8 @@ body {
 .brand-logo {
   border: 1px solid var(--accent-gold);
   background: rgba(197, 160, 89, 0.05);
-  width: 72px;
-  height: 72px;
+  width: 84px;
+  height: 84px;
   border-radius: 50%;
   overflow: hidden;
   display: flex;

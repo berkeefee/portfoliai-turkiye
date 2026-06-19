@@ -313,8 +313,8 @@ export default function LandingPage() {
       >
         <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '0 1rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, #c5a059, #d3b374)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Sparkles style={{ width: '16px', height: '16px', color: '#fff' }} />
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(197, 160, 89, 0.3)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(197, 160, 89, 0.05)', boxShadow: '0 0 10px rgba(197, 160, 89, 0.1)', flexShrink: 0 }}>
+              <img src="/logo.png" alt="Çalışkan Borsa Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <span style={{ fontSize: '1.125rem', fontWeight: 700 }}>Çalışkan Borsa</span>
           </div>
@@ -515,8 +515,8 @@ export default function LandingPage() {
       <footer style={{ borderTop: '1px solid rgba(197, 160, 89, 0.15)', padding: '3rem 1rem' }}>
         <div className="landing-footer-inner" style={{ maxWidth: '72rem', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'linear-gradient(135deg, #c5a059, #d3b374)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Sparkles style={{ width: '14px', height: '14px', color: '#fff' }} />
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid rgba(197, 160, 89, 0.3)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(197, 160, 89, 0.05)', boxShadow: '0 0 10px rgba(197, 160, 89, 0.1)', flexShrink: 0 }}>
+              <img src="/logo.png" alt="Çalışkan Borsa Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>Çalışkan Borsa</span>
           </div>
