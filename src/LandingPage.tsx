@@ -313,7 +313,7 @@ export default function LandingPage() {
       >
         <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '0 1rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(197, 160, 89, 0.3)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(197, 160, 89, 0.05)', boxShadow: '0 0 10px rgba(197, 160, 89, 0.1)', flexShrink: 0 }}>
+            <div style={{ width: '54px', height: '54px', borderRadius: '50%', border: '1px solid rgba(197, 160, 89, 0.3)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(197, 160, 89, 0.05)', boxShadow: '0 0 10px rgba(197, 160, 89, 0.1)', flexShrink: 0 }}>
               <img src="/logo.png" alt="Çalışkan Borsa Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <span style={{ fontSize: '1.125rem', fontWeight: 700 }}>Çalışkan Borsa</span>
@@ -390,7 +390,7 @@ export default function LandingPage() {
           <div className="landing-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }}>
             {features.map((f, i) => (
               <motion.div key={f.title} variants={fadeUp} custom={i} className="landing-card" style={cardStyle}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(197, 160, 89, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                <div style={{ width: '54px', height: '54px', borderRadius: '12px', background: 'rgba(197, 160, 89, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
                   <f.icon style={{ width: '20px', height: '20px', color: '#d3b374' }} />
                 </div>
                 <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px' }}>{f.title}</h3>
@@ -469,7 +469,7 @@ export default function LandingPage() {
                 </div>
                 <p style={{ fontSize: '0.875rem', color: '#a3a3a3', lineHeight: 1.6, marginBottom: '20px' }}>"{t.text}"</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(197, 160, 89, 0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(197, 160, 89, 0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#d3b374' }}>{t.name.charAt(0)}</span>
                   </div>
                   <div>
@@ -515,7 +515,7 @@ export default function LandingPage() {
       <footer style={{ borderTop: '1px solid rgba(197, 160, 89, 0.15)', padding: '3rem 1rem' }}>
         <div className="landing-footer-inner" style={{ maxWidth: '72rem', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid rgba(197, 160, 89, 0.3)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(197, 160, 89, 0.05)', boxShadow: '0 0 10px rgba(197, 160, 89, 0.1)', flexShrink: 0 }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '1px solid rgba(197, 160, 89, 0.3)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(197, 160, 89, 0.05)', boxShadow: '0 0 10px rgba(197, 160, 89, 0.1)', flexShrink: 0 }}>
               <img src="/logo.png" alt="Çalışkan Borsa Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>Çalışkan Borsa</span>
