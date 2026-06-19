@@ -122,16 +122,16 @@ function MagicLinkForm({ variant = 'hero' }: { variant?: 'hero' | 'contact' }) {
               paddingRight: '16px',
               paddingTop: '14px',
               paddingBottom: '14px',
-              background: '#171717',
-              border: '1px solid #262626',
+              background: 'rgba(13, 15, 20, 0.85)',
+              border: '1px solid rgba(197, 160, 89, 0.12)',
               borderRadius: '12px',
               color: '#fff',
               fontSize: '0.875rem',
               outline: 'none',
               transition: 'border-color 0.3s',
             }}
-            onFocus={(e) => e.target.style.borderColor = '#6366f1'}
-            onBlur={(e) => e.target.style.borderColor = '#262626'}
+            onFocus={(e) => e.target.style.borderColor = '#c5a059'}
+            onBlur={(e) => e.target.style.borderColor = 'rgba(197, 160, 89, 0.12)'}
           />
         </div>
         <motion.button
@@ -141,7 +141,7 @@ function MagicLinkForm({ variant = 'hero' }: { variant?: 'hero' | 'contact' }) {
           whileTap={{ scale: 0.98 }}
           style={{
             padding: '14px 24px',
-            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+            background: 'linear-gradient(135deg, #c5a059, #d3b374)',
             color: '#fff',
             fontSize: '0.875rem',
             fontWeight: 600,
@@ -153,7 +153,7 @@ function MagicLinkForm({ variant = 'hero' }: { variant?: 'hero' | 'contact' }) {
             justifyContent: 'center',
             gap: '8px',
             opacity: status === 'loading' ? 0.5 : 1,
-            boxShadow: '0 8px 24px rgba(99, 102, 241, 0.25)',
+            boxShadow: '0 8px 24px rgba(197, 160, 89, 0.25)',
             transition: 'all 0.3s',
           }}
         >
@@ -208,7 +208,7 @@ function InfiniteSlider({ children, speed = 30 }: { children: React.ReactNode; s
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <motion.div variants={fadeUp} style={{ border: '1px solid #262626', borderRadius: '12px', overflow: 'hidden' }}>
+    <motion.div variants={fadeUp} style={{ border: '1px solid rgba(197, 160, 89, 0.12)', borderRadius: '12px', overflow: 'hidden' }}>
       <button
         onClick={() => setOpen(!open)}
         style={{
@@ -278,15 +278,15 @@ export default function LandingPage() {
   ]
 
   const sectionMaxWidth = { maxWidth: '72rem', margin: '0 auto' }
-  const cardStyle: React.CSSProperties = { padding: '24px', background: '#171717', border: '1px solid #262626', borderRadius: '16px', transition: 'all 0.5s' }
+  const cardStyle: React.CSSProperties = { padding: '24px', background: 'rgba(13, 15, 20, 0.85)', border: '1px solid rgba(197, 160, 89, 0.12)', borderRadius: '16px', transition: 'all 0.5s' }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#fff', fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif", overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: '#06070a', color: '#fff', fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif", overflowX: 'hidden' }}>
       {/* ─── CSS keyframes ─── */}
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
-        .landing-card:hover { border-color: rgba(99,102,241,0.3) !important; transform: translateY(-4px); }
+        .landing-card:hover { border-color: rgba(197, 160, 89, 0.3) !important; transform: translateY(-4px); }
         .landing-nav-link:hover { color: #fff !important; }
         .landing-plan:hover { transform: translateY(-6px); }
         .landing-testimonial:hover { border-color: #404040 !important; }
@@ -306,14 +306,14 @@ export default function LandingPage() {
         animate={{ y: 0, opacity: 1 }}
         style={{
           position: 'fixed', top: 0, width: '100%', zIndex: 50,
-          borderBottom: '1px solid rgba(38,38,38,0.5)',
-          background: 'rgba(10,10,10,0.8)',
+          borderBottom: '1px solid rgba(197, 160, 89, 0.15)',
+          background: 'rgba(6, 7, 10, 0.8)',
           backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
         }}
       >
         <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '0 1rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, #c5a059, #d3b374)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Sparkles style={{ width: '16px', height: '16px', color: '#fff' }} />
             </div>
             <span style={{ fontSize: '1.125rem', fontWeight: 700 }}>Çalışkan Borsa</span>
@@ -323,7 +323,7 @@ export default function LandingPage() {
               <a key={href} href={href} className="landing-nav-link" style={{ color: '#a3a3a3', textDecoration: 'none', transition: 'color 0.3s' }}>{label}</a>
             ))}
           </div>
-          <a href="#giris" style={{ padding: '8px 16px', fontSize: '0.875rem', fontWeight: 500, background: '#171717', border: '1px solid #262626', borderRadius: '8px', color: '#fff', textDecoration: 'none', transition: 'border-color 0.3s' }}>
+          <a href="#giris" style={{ padding: '8px 16px', fontSize: '0.875rem', fontWeight: 500, background: 'rgba(13, 15, 20, 0.85)', border: '1px solid rgba(197, 160, 89, 0.12)', borderRadius: '8px', color: '#fff', textDecoration: 'none', transition: 'border-color 0.3s' }}>
             Giriş Yap
           </a>
         </div>
@@ -333,16 +333,16 @@ export default function LandingPage() {
       <Section id="giris" className="" >
         <div style={{ ...sectionMaxWidth, maxWidth: '60rem', textAlign: 'center', paddingTop: '5rem' }}>
           {/* Ambient glow */}
-          <div style={{ position: 'absolute', top: '80px', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '400px', background: 'radial-gradient(ellipse, rgba(99,102,241,0.12), transparent 70%)', borderRadius: '50%', filter: 'blur(80px)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: '80px', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '400px', background: 'radial-gradient(circle at 50% 30%, rgba(197, 160, 89, 0.08) 0%, transparent 65%)', borderRadius: '50%', filter: 'blur(80px)', pointerEvents: 'none' }} />
 
-          <motion.div variants={fadeUp} custom={0} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', marginBottom: '2rem', fontSize: '0.75rem', fontWeight: 500, background: 'rgba(99,102,241,0.1)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '9999px' }}>
+          <motion.div variants={fadeUp} custom={0} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', marginBottom: '2rem', fontSize: '0.75rem', fontWeight: 500, background: 'rgba(197, 160, 89, 0.08)', color: '#d3b374', border: '1px solid rgba(197, 160, 89, 0.18)', borderRadius: '9999px' }}>
             <Sparkles style={{ width: '14px', height: '14px' }} />
             Yapay Zeka Destekli Portföy Yönetimi
           </motion.div>
 
           <motion.h1 variants={fadeUp} custom={1} className="landing-hero-title" style={{ fontSize: '4rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, marginBottom: '1.5rem' }}>
             Yatırımlarınızı AI ile{' '}
-            <span style={{ background: 'linear-gradient(to right, #818cf8, #a78bfa, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span style={{ background: 'linear-gradient(to right, #c5a059, #d3b374, #f3dcb3)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Optimize Edin
             </span>
           </motion.h1>
@@ -369,7 +369,7 @@ export default function LandingPage() {
       </Section>
 
       {/* ─── PROOF / LOGOS SLIDER ─── */}
-      <div style={{ padding: '3rem 0', borderTop: '1px solid rgba(38,38,38,0.5)', borderBottom: '1px solid rgba(38,38,38,0.5)' }}>
+      <div style={{ padding: '3rem 0', borderTop: '1px solid rgba(197, 160, 89, 0.15)', borderBottom: '1px solid rgba(197, 160, 89, 0.15)' }}>
         <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#a3a3a3', marginBottom: '2rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Desteklenen Altyapı & Veri Kaynakları</p>
         <InfiniteSlider speed={40}>
           {['TEFAS', 'KAP', 'BIST', 'Gemini AI', 'Supabase', 'Vercel', 'TypeScript', 'React'].map((t) => (
@@ -382,7 +382,7 @@ export default function LandingPage() {
       <Section id="ozellikler">
         <div style={sectionMaxWidth}>
           <motion.div variants={fadeUp} style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#818cf8', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Özellikler</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#d3b374', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Özellikler</span>
             <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginTop: '12px' }}>Portföyünüzü Optimize Eden Teknolojiler</h2>
             <p style={{ color: '#a3a3a3', marginTop: '1rem', maxWidth: '32rem', margin: '1rem auto 0', fontSize: '0.875rem' }}>Yatırım fonlarınızı analiz etmek, riskleri yönetmek ve yapay zeka desteğiyle büyütmek için ihtiyacınız olan her şey.</p>
           </motion.div>
@@ -390,8 +390,8 @@ export default function LandingPage() {
           <div className="landing-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }}>
             {features.map((f, i) => (
               <motion.div key={f.title} variants={fadeUp} custom={i} className="landing-card" style={cardStyle}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(99,102,241,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
-                  <f.icon style={{ width: '20px', height: '20px', color: '#818cf8' }} />
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(197, 160, 89, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                  <f.icon style={{ width: '20px', height: '20px', color: '#d3b374' }} />
                 </div>
                 <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px' }}>{f.title}</h3>
                 <p style={{ fontSize: '0.875rem', color: '#a3a3a3', lineHeight: 1.6 }}>{f.desc}</p>
@@ -403,9 +403,9 @@ export default function LandingPage() {
 
       {/* ─── PRICING ─── */}
       <Section id="fiyatlandirma">
-        <div style={{ ...sectionMaxWidth, background: 'rgba(13,13,13,0.5)', borderRadius: '24px', padding: '4rem 2rem' }}>
+        <div style={{ ...sectionMaxWidth, background: 'rgba(13, 15, 20, 0.5)', borderRadius: '24px', padding: '4rem 2rem' }}>
           <motion.div variants={fadeUp} style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#818cf8', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Fiyatlandırma</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#d3b374', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Fiyatlandırma</span>
             <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginTop: '12px' }}>Size Uygun Planı Seçin</h2>
             <p style={{ color: '#a3a3a3', marginTop: '1rem', fontSize: '0.875rem' }}>Taahhüt yok. İstediğiniz zaman iptal edin.</p>
           </motion.div>
@@ -414,12 +414,12 @@ export default function LandingPage() {
             {plans.map((plan, i) => (
               <motion.div key={plan.name} variants={scaleIn} custom={i} className="landing-plan" style={{
                 position: 'relative', padding: '28px', borderRadius: '16px', transition: 'all 0.5s',
-                background: '#171717',
-                border: plan.popular ? '1px solid rgba(99,102,241,0.5)' : '1px solid #262626',
-                boxShadow: plan.popular ? '0 8px 32px rgba(99,102,241,0.1)' : 'none',
+                background: 'rgba(13, 15, 20, 0.85)',
+                border: plan.popular ? '1px solid rgba(197, 160, 89, 0.5)' : '1px solid rgba(197, 160, 89, 0.12)',
+                boxShadow: plan.popular ? '0 8px 32px rgba(197, 160, 89, 0.08)' : 'none',
               }}>
                 {plan.popular && (
-                  <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', padding: '4px 12px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', borderRadius: '9999px' }}>
+                  <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', padding: '4px 12px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', background: 'linear-gradient(135deg, #c5a059, #d3b374)', color: '#fff', borderRadius: '9999px' }}>
                     Popüler
                   </div>
                 )}
@@ -432,16 +432,16 @@ export default function LandingPage() {
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {plan.features.map((f) => (
                     <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.875rem', color: '#a3a3a3' }}>
-                      <Check style={{ width: '16px', height: '16px', color: '#818cf8', flexShrink: 0 }} />
+                      <Check style={{ width: '16px', height: '16px', color: '#d3b374', flexShrink: 0 }} />
                       {f}
                     </li>
                   ))}
                 </ul>
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} style={{
                   width: '100%', padding: '12px', borderRadius: '12px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.3s', border: 'none',
-                  background: plan.popular ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : '#0a0a0a',
+                  background: plan.popular ? 'linear-gradient(135deg, #c5a059, #d3b374)' : '#0a0a0a',
                   color: '#fff',
-                  ...(plan.popular ? { boxShadow: '0 8px 24px rgba(99,102,241,0.25)' } : { border: '1px solid #262626' }),
+                  ...(plan.popular ? { boxShadow: '0 8px 24px rgba(197, 160, 89, 0.18)' } : { border: '1px solid rgba(197, 160, 89, 0.12)' }),
                 }}>
                   Hemen Başla
                 </motion.button>
@@ -455,7 +455,7 @@ export default function LandingPage() {
       <Section id="yorumlar">
         <div style={sectionMaxWidth}>
           <motion.div variants={fadeUp} style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#818cf8', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Yorumlar</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#d3b374', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Yorumlar</span>
             <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginTop: '12px' }}>Yatırımcılarımızın Yorumları</h2>
           </motion.div>
 
@@ -464,13 +464,13 @@ export default function LandingPage() {
               <motion.div key={t.name} variants={fadeUp} custom={i} className="landing-testimonial" style={cardStyle}>
                 <div style={{ display: 'flex', gap: '4px', marginBottom: '16px' }}>
                   {Array.from({ length: 5 }).map((_, s) => (
-                    <Star key={s} style={{ width: '16px', height: '16px', color: s < t.rating ? '#facc15' : '#262626', fill: s < t.rating ? '#facc15' : 'none' }} />
+                    <Star key={s} style={{ width: '16px', height: '16px', color: s < t.rating ? '#facc15' : 'rgba(197, 160, 89, 0.15)', fill: s < t.rating ? '#facc15' : 'none' }} />
                   ))}
                 </div>
                 <p style={{ fontSize: '0.875rem', color: '#a3a3a3', lineHeight: 1.6, marginBottom: '20px' }}>"{t.text}"</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(99,102,241,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#818cf8' }}>{t.name.charAt(0)}</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(197, 160, 89, 0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#d3b374' }}>{t.name.charAt(0)}</span>
                   </div>
                   <div>
                     <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>{t.name}</p>
@@ -487,7 +487,7 @@ export default function LandingPage() {
       <Section id="sss">
         <div style={{ ...sectionMaxWidth, maxWidth: '40rem' }}>
           <motion.div variants={fadeUp} style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#818cf8', letterSpacing: '0.15em', textTransform: 'uppercase' }}>S.S.S</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#d3b374', letterSpacing: '0.15em', textTransform: 'uppercase' }}>S.S.S</span>
             <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginTop: '12px' }}>Sıkça Sorulan Sorular</h2>
           </motion.div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -499,9 +499,9 @@ export default function LandingPage() {
       {/* ─── CONTACT / CTA ─── */}
       <Section id="iletisim">
         <div style={{ ...sectionMaxWidth, maxWidth: '40rem', textAlign: 'center' }}>
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '500px', height: '300px', background: 'radial-gradient(ellipse, rgba(99,102,241,0.08), transparent 70%)', borderRadius: '50%', filter: 'blur(80px)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '500px', height: '300px', background: 'radial-gradient(circle, rgba(197, 160, 89, 0.05) 0%, transparent 70%)', borderRadius: '50%', filter: 'blur(80px)', pointerEvents: 'none' }} />
           <motion.div variants={fadeUp}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#818cf8', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Hemen Başlayın</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#d3b374', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Hemen Başlayın</span>
             <h2 style={{ fontSize: '2.25rem', fontWeight: 700, marginTop: '12px', marginBottom: '16px' }}>Yatırımlarınızı Optimize Etmeye Hazır mısınız?</h2>
             <p style={{ color: '#a3a3a3', fontSize: '0.875rem', marginBottom: '2.5rem' }}>E-posta adresinizi girin, size özel giriş linkini anında e-postanıza gönderelim.</p>
           </motion.div>
@@ -512,10 +512,10 @@ export default function LandingPage() {
       </Section>
 
       {/* ─── FOOTER ─── */}
-      <footer style={{ borderTop: '1px solid rgba(38,38,38,0.5)', padding: '3rem 1rem' }}>
+      <footer style={{ borderTop: '1px solid rgba(197, 160, 89, 0.15)', padding: '3rem 1rem' }}>
         <div className="landing-footer-inner" style={{ maxWidth: '72rem', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'linear-gradient(135deg, #c5a059, #d3b374)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Sparkles style={{ width: '14px', height: '14px', color: '#fff' }} />
             </div>
             <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>Çalışkan Borsa</span>
