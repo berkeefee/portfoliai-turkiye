@@ -144,6 +144,64 @@ function Dashboard({ user }: { user: User }) {
   
   // New User Risk Profile States
   const [riskLevel, setRiskLevel] = useState<number>(5); // 1-10
+  
+  // Database Save Status
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  // Load saved portfolio from database on mount
+  useEffect(() => {
+    const loadSavedPortfolio = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('user_portfolios')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (data && !error) {
+          if (data.risk_level !== undefined) setRiskLevel(data.risk_level);
+          if (data.investment_goal) setInvestmentGoal(data.investment_goal as any);
+          if (data.horizon) setHorizon(data.horizon as any);
+          if (data.portfolio) setCustomPortfolio(data.portfolio);
+        }
+      } catch (err) {
+        console.error("Kayıtlı portföy yüklenirken hata oluştu:", err);
+      }
+    };
+
+    loadSavedPortfolio();
+  }, [user.id]);
+
+  // Save portfolio to database helper
+  const saveUserPortfolio = async (
+    rL = riskLevel,
+    iG = investmentGoal,
+    hz = horizon,
+    cP = customPortfolio
+  ) => {
+    if (!user) return;
+    setSaveStatus('saving');
+    try {
+      const { error } = await supabase
+        .from('user_portfolios')
+        .upsert({
+          user_id: user.id,
+          portfolio: cP,
+          risk_level: rL,
+          investment_goal: iG,
+          horizon: hz,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+
+      if (error) throw error;
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch (err) {
+      console.error("Portföy kaydedilirken hata oluştu:", err);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  };
   const [investmentGoal, setInvestmentGoal] = useState<'preservation' | 'balanced' | 'growth' | 'income'>('balanced');
   const [horizon, setHorizon] = useState<'short' | 'medium' | 'long'>('medium');
   
@@ -366,6 +424,9 @@ function Dashboard({ user }: { user: User }) {
     const hz = overrideParams ? overrideParams.horizon : horizon;
     const aM = overrideParams ? overrideParams.activeMode : activeMode;
     const cP = overrideParams ? overrideParams.customPortfolio : customPortfolio;
+
+    // Save portfolio asynchronously to DB
+    saveUserPortfolio(rL, iG, hz, cP);
 
     setIsRunning(true);
     setLogs([]);
@@ -1051,25 +1112,53 @@ function Dashboard({ user }: { user: User }) {
               const totalWeight = customPortfolio.reduce((sum, item) => sum + item.weight, 0);
               const isDisabled = isRunning || (activeMode === 'analyze' && totalWeight !== 100);
               return (
-                <div className="action-btn-container" style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.25rem' }}>
+                  <div className="action-btn-container" style={{ display: 'flex', gap: '0.75rem', margin: 0 }}>
+                    <button 
+                      className="btn btn-primary" 
+                      style={{ flex: 1, padding: '0.85rem' }} 
+                      onClick={() => startOrchestration(false)}
+                      disabled={isDisabled}
+                    >
+                      <RefreshCw size={16} className={isRunning ? 'pulse-dot' : ''} />
+                      {activeMode === 'analyze' ? 'Mevcut Portföyü Analiz Et' : 'Simüle Portföy Kur'}
+                    </button>
+                    
+                    <button 
+                      className="btn btn-accent" 
+                      style={{ flex: 1, padding: '0.85rem' }} 
+                      onClick={() => startOrchestration(true)}
+                      disabled={isDisabled}
+                    >
+                      <Play size={16} />
+                      {activeMode === 'analyze' ? 'Gemini Canlı Analiz Et' : 'Gemini Canlı Portföy Kur'}
+                    </button>
+                  </div>
+
                   <button 
-                    className="btn btn-primary" 
-                    style={{ flex: 1, padding: '0.85rem' }} 
-                    onClick={() => startOrchestration(false)}
-                    disabled={isDisabled}
+                    type="button"
+                    className="btn" 
+                    style={{ 
+                      width: '100%', 
+                      padding: '0.75rem', 
+                      fontSize: '0.8rem', 
+                      borderColor: saveStatus === 'saved' ? '#10b981' : saveStatus === 'error' ? '#ef4444' : 'var(--border-glass)',
+                      color: saveStatus === 'saved' ? '#10b981' : saveStatus === 'error' ? '#ef4444' : 'var(--text-secondary)',
+                      background: 'rgba(255, 255, 255, 0.01)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      margin: 0
+                    }} 
+                    onClick={() => saveUserPortfolio()}
+                    disabled={isRunning || saveStatus === 'saving'}
                   >
-                    <RefreshCw size={16} className={isRunning ? 'pulse-dot' : ''} />
-                    {activeMode === 'analyze' ? 'Mevcut Portföyü Analiz Et' : 'Simüle Portföy Kur'}
-                  </button>
-                  
-                  <button 
-                    className="btn btn-accent" 
-                    style={{ flex: 1, padding: '0.85rem' }} 
-                    onClick={() => startOrchestration(true)}
-                    disabled={isDisabled}
-                  >
-                    <Play size={16} />
-                    {activeMode === 'analyze' ? 'Gemini Canlı Analiz Et' : 'Gemini Canlı Portföy Kur'}
+                    {saveStatus === 'saving' && <div style={{ width: '12px', height: '12px', border: '2px solid rgba(255,255,255,0.2)', borderTop: '2px solid var(--accent-gold)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />}
+                    {saveStatus === 'idle' && 'Ayarları Veritabanına Kaydet'}
+                    {saveStatus === 'saving' && 'Kaydediliyor...'}
+                    {saveStatus === 'saved' && 'Ayarlar Başarıyla Kaydedildi! ✓'}
+                    {saveStatus === 'error' && 'Kaydetme Hatası! ✕'}
                   </button>
                 </div>
               );
