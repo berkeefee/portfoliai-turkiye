@@ -88,41 +88,23 @@ export default function App() {
   // Auth State
   // -------------------------------------------------------------
   const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(supabaseConfigured);
   const [showLogin, setShowLogin] = useState<boolean>(false);
 
   useEffect(() => {
     if (!supabaseConfigured) return;
 
-    // Check current session
+    // Check current session in the background
     supabase.auth.getUser().then(({ data: { user: u } }) => {
-      setUser(u);
-      setAuthLoading(false);
-    }).catch(() => {
-      setAuthLoading(false);
-    });
+      if (u) setUser(u);
+    }).catch(() => {});
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      setAuthLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
-
-  // Show loading screen while checking auth
-  if (authLoading) {
-    return (
-      <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ width: '40px', height: '40px', border: '3px solid rgba(99,102,241,0.2)', borderTop: '3px solid #6366f1', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: '#a3a3a3', fontSize: '0.875rem' }}>Yükleniyor...</p>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
-      </div>
-    );
-  }
 
   // Show LandingPage if not authenticated and showLogin is true
   if (showLogin && !user) {
