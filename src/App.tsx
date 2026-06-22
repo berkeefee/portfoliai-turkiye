@@ -1211,7 +1211,7 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                       disabled={isDisabled}
                     >
                       <Play size={16} />
-                      {activeMode === 'analyze' ? 'Gemini Canlı Analiz Et' : 'Gemini Canlı Portföy Kur'}
+                      {activeMode === 'analyze' ? 'AI ile Detaylı Analiz Et' : 'AI ile Detaylı Portföy Kur'}
                     </button>
                   </div>
 
