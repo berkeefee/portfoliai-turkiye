@@ -94,8 +94,8 @@ export default function App() {
     if (!supabaseConfigured) return;
 
     // Check current session in the background
-    supabase.auth.getUser().then(({ data: { user: u } }) => {
-      if (u) setUser(u);
+    supabase.auth.getUser().then(({ data: { user: fetchedUser } }) => {
+      if (fetchedUser) setUser(fetchedUser);
     }).catch(() => {});
 
     // Listen for auth changes
@@ -131,6 +131,17 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
   // Database Save Status
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
+
+  const [investmentGoal, setInvestmentGoal] = useState<'preservation' | 'balanced' | 'growth' | 'income'>('balanced');
+  const [horizon, setHorizon] = useState<'short' | 'medium' | 'long'>('medium');
+  
+  // Custom Portfolio Mode States
+  const [activeMode, setActiveMode] = useState<'build' | 'analyze'>('build');
+  const [customPortfolio, setCustomPortfolio] = useState<AgentPortfolioItem[]>([
+    { code: 'MAC', weight: 40 },
+    { code: 'TMV', weight: 30 },
+    { code: 'AFT', weight: 30 }
+  ]);
 
   // Load saved portfolio from database on mount
   useEffect(() => {
@@ -203,16 +214,6 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
       setTimeout(() => setSaveStatus('idle'), 3000);
     }
   };
-  const [investmentGoal, setInvestmentGoal] = useState<'preservation' | 'balanced' | 'growth' | 'income'>('balanced');
-  const [horizon, setHorizon] = useState<'short' | 'medium' | 'long'>('medium');
-  
-  // Custom Portfolio Mode States
-  const [activeMode, setActiveMode] = useState<'build' | 'analyze'>('build');
-  const [customPortfolio, setCustomPortfolio] = useState<AgentPortfolioItem[]>([
-    { code: 'MAC', weight: 40 },
-    { code: 'TMV', weight: 30 },
-    { code: 'AFT', weight: 30 }
-  ]);
 
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [activeAgentIndex, setActiveAgentIndex] = useState<number>(-1); // -1 = idle
