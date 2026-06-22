@@ -147,6 +147,7 @@ function Dashboard({ user }: { user: User }) {
   
   // Database Save Status
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
 
   // Load saved portfolio from database on mount
   useEffect(() => {
@@ -166,11 +167,24 @@ function Dashboard({ user }: { user: User }) {
         }
       } catch (err) {
         console.error("Kayıtlı portföy yüklenirken hata oluştu:", err);
+      } finally {
+        setIsInitialLoad(false);
       }
     };
 
     loadSavedPortfolio();
   }, [user.id]);
+
+  // Debounced auto-save effect
+  useEffect(() => {
+    if (isInitialLoad) return;
+
+    const timer = setTimeout(() => {
+      saveUserPortfolio();
+    }, 1500); // Auto save 1.5 seconds after user stops modifying settings
+
+    return () => clearTimeout(timer);
+  }, [riskLevel, investmentGoal, horizon, customPortfolio, isInitialLoad]);
 
   // Save portfolio to database helper
   const saveUserPortfolio = async (
@@ -1135,31 +1149,23 @@ function Dashboard({ user }: { user: User }) {
                     </button>
                   </div>
 
-                  <button 
-                    type="button"
-                    className="btn" 
-                    style={{ 
-                      width: '100%', 
-                      padding: '0.75rem', 
-                      fontSize: '0.8rem', 
-                      borderColor: saveStatus === 'saved' ? '#10b981' : saveStatus === 'error' ? '#ef4444' : 'var(--border-glass)',
-                      color: saveStatus === 'saved' ? '#10b981' : saveStatus === 'error' ? '#ef4444' : 'var(--text-secondary)',
-                      background: 'rgba(255, 255, 255, 0.01)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      margin: 0
-                    }} 
-                    onClick={() => saveUserPortfolio()}
-                    disabled={isRunning || saveStatus === 'saving'}
-                  >
-                    {saveStatus === 'saving' && <div style={{ width: '12px', height: '12px', border: '2px solid rgba(255,255,255,0.2)', borderTop: '2px solid var(--accent-gold)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />}
-                    {saveStatus === 'idle' && 'Ayarları Veritabanına Kaydet'}
-                    {saveStatus === 'saving' && 'Kaydediliyor...'}
-                    {saveStatus === 'saved' && 'Ayarlar Başarıyla Kaydedildi! ✓'}
-                    {saveStatus === 'error' && 'Kaydetme Hatası! ✕'}
-                  </button>
+                  {saveStatus !== 'idle' && (
+                    <div style={{ 
+                      fontSize: '0.75rem', 
+                      color: saveStatus === 'saved' ? '#10b981' : saveStatus === 'error' ? '#ef4444' : 'var(--text-secondary)', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '6px', 
+                      justifyContent: 'center', 
+                      marginTop: '0.25rem',
+                      minHeight: '16px'
+                    }}>
+                      {saveStatus === 'saving' && <div style={{ width: '10px', height: '10px', border: '2px solid rgba(255,255,255,0.2)', borderTop: '2px solid var(--accent-gold)', borderRadius: '50%', animation: 'spin 1s linear infinite', marginRight: '4px' }} />}
+                      {saveStatus === 'saving' && 'Değişiklikler kaydediliyor...'}
+                      {saveStatus === 'saved' && 'Değişiklikler otomatik kaydedildi ✓'}
+                      {saveStatus === 'error' && 'Otomatik kaydetme hatası ✕'}
+                    </div>
+                  )}
                 </div>
               );
             })()}
