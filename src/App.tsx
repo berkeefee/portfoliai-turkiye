@@ -2710,12 +2710,17 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                                           <Zap size={10} style={{ color: 'var(--accent-gold)', flexShrink: 0 }} />
                                           <span>
                                             {(() => {
-                                              const compVal = backtestCompareMode === 'gold' ? hoveredGoldVal : hoveredBistVal;
+                                              let compVal = hoveredBistVal;
+                                              let label = 'BIST 100';
+                                              if (backtestCompareMode === 'gold') {
+                                                compVal = hoveredGoldVal;
+                                                label = 'Altın';
+                                              }
                                               const diff = hoveredPortfolioVal - compVal;
                                               if (diff > 0) {
-                                                return `AI Sepeti %${diff.toFixed(1)} daha karlı`;
+                                                return `Portföyünüz ${label}'e göre %${diff.toFixed(1)} önde`;
                                               } else if (diff < 0) {
-                                                return `AI Sepeti %${Math.abs(diff).toFixed(1)} geride`;
+                                                return `Portföyünüz ${label}'e göre %${Math.abs(diff).toFixed(1)} geride`;
                                               } else {
                                                 return `Başabaş seyrediyor`;
                                               }
@@ -2751,51 +2756,70 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                             AI Sepet Yarış Analizi
                           </h4>
                           
-                          {backtestCompareMode === 'all' && (
-                            <div>
-                              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                12 aylık geriye dönük test (backtest) sonuçlarına göre <strong>Yapay Zeka Sepeti</strong>, hem <strong>BIST 100 Endeksi'ni</strong> (%48.0) hem de <strong>Saf Altın'ı</strong> (%42.5) geride bırakarak <strong>%{analysisResult.backtest?.totalReturn || 72}</strong> getiriyle yarışı lider tamamlamıştır.
-                              </p>
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '0.75rem' }}>
-                                <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.02)' }}>
-                                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>BIST 100'e Karşı Alfa</span>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#10b981' }}>+%{((analysisResult.backtest?.totalReturn || 72) - 48.0).toFixed(1)} Outperformance</span>
-                                </div>
-                                <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.02)' }}>
-                                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>Altın'a Karşı Alfa</span>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#10b981' }}>+%{((analysisResult.backtest?.totalReturn || 72) - 42.5).toFixed(1)} Outperformance</span>
-                                </div>
-                              </div>
-                            </div>
-                          )}
+                          {(() => {
+                            const portRet = analysisResult.backtest?.totalReturn || 0;
+                            const bistRet = bistData.length > 0 ? Math.round(bistData[bistData.length - 1].value - 100) : 36.9;
+                            const goldRet = goldData.length > 0 ? Math.round(goldData[goldData.length - 1].value - 100) : 50.0;
 
-                          {backtestCompareMode === 'bist' && (
-                            <div>
-                              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                Yapay Zeka Sepeti (%{analysisResult.backtest?.totalReturn || 72}), BIST 100 endeksine (%48.0) karşı <strong>+%{((analysisResult.backtest?.totalReturn || 72) - 48.0).toFixed(1)}</strong> oranında daha yüksek getiri sunmuştur. Portföydeki hisse senedi fon seçimi (MAC, IIH vb.) endeks üzeri getiri sağlamada kritik rol oynamıştır.
-                              </p>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '0.75rem', background: 'rgba(59, 130, 246, 0.05)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(59, 130, 246, 0.1)' }}>
-                                <Info size={14} style={{ color: '#3b82f6', flexShrink: 0 }} />
-                                <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
-                                  BIST 100 yatay seyrederken, AI algoritması korumacı ve algoritma serbest fonlarına ağırlık vererek drawdown koruması sağlamıştır.
-                                </span>
-                              </div>
-                            </div>
-                          )}
+                            const bistDiff = portRet - bistRet;
+                            const goldDiff = portRet - goldRet;
 
-                          {backtestCompareMode === 'gold' && (
-                            <div>
-                              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                Güvenli liman Saf Altın (%42.5) enflasyon şoklarına karşı dengeli bir getiri sunarken, Yapay Zeka Sepeti (%{analysisResult.backtest?.totalReturn || 72}) altının getirisini <strong>+%{((analysisResult.backtest?.totalReturn || 72) - 42.5).toFixed(1)}</strong> aşarak sermayenizi reel olarak büyütmeyi başarmıştır.
-                              </p>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '0.75rem', background: 'rgba(245, 158, 11, 0.05)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(245, 158, 11, 0.1)' }}>
-                                <Info size={14} style={{ color: '#f59e0b', flexShrink: 0 }} />
-                                <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
-                                  Altın sabit kur/ons baskılarında yavaş ilerlerken, AI sepetindeki teknoloji fonları (AFT) ve serbest fonlar küresel ve yerel fırsatları hızlıca yakalamıştır.
-                                </span>
-                              </div>
-                            </div>
-                          )}
+                            const isWinner = portRet > bistRet && portRet > goldRet;
+
+                            return (
+                              <>
+                                {backtestCompareMode === 'all' && (
+                                  <div>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                      12 aylık geriye dönük test (backtest) sonuçlarına göre portföyünüz <strong>%{portRet}</strong> getiri sağlarken, aynı dönemde <strong>BIST 100 Endeksi</strong> %{bistRet} ve <strong>Saf Altın</strong> %{goldRet} performans göstermiştir. {isWinner ? <strong>Portföyünüz yarışı lider tamamlamıştır.</strong> : <strong>Portföyünüz piyasa koşullarına göre dengeli bir seyir izlemiştir.</strong>}
+                                    </p>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '0.75rem' }}>
+                                      <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>BIST 100'e Karşı Alfa</span>
+                                        <span style={{ fontSize: '0.85rem', fontWeight: 800, color: bistDiff >= 0 ? '#10b981' : '#f87171' }}>
+                                          {bistDiff >= 0 ? `+%${bistDiff.toFixed(1)} Alfa` : `-%${Math.abs(bistDiff).toFixed(1)} Geride`}
+                                        </span>
+                                      </div>
+                                      <div style={{ background: 'rgba(255,255,255,0.01)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}>Altın'a Karşı Alfa</span>
+                                        <span style={{ fontSize: '0.85rem', fontWeight: 800, color: goldDiff >= 0 ? '#10b981' : '#f87171' }}>
+                                          {goldDiff >= 0 ? `+%${goldDiff.toFixed(1)} Alfa` : `-%${Math.abs(goldDiff).toFixed(1)} Geride`}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {backtestCompareMode === 'bist' && (
+                                  <div>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                      Portföyünüz (%{portRet}), BIST 100 endeksine (%{bistRet}) karşı <strong>{bistDiff >= 0 ? `+%${bistDiff.toFixed(1)}` : `-%${Math.abs(bistDiff).toFixed(1)}`}</strong> fark oluşturmuştur. Portföydeki varlık dağılımı (seçilen fon kodları ve risk limitleri) endeks üzeri getiri ve volatilite dengesi sağlamada kritik rol oynamıştır.
+                                    </p>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '0.75rem', background: 'rgba(59, 130, 246, 0.05)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(59, 130, 246, 0.1)' }}>
+                                      <Info size={14} style={{ color: '#3b82f6', flexShrink: 0 }} />
+                                      <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
+                                        BIST 100 dalgalanırken, sepetinizdeki algoritma/koruma fonları ve risksiz likit varlıklar drawdown riskini düşürmüştür.
+                                      </span>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {backtestCompareMode === 'gold' && (
+                                  <div>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                      Güvenli liman Saf Altın (%{goldRet}) enflasyona karşı dengeli bir getiri sunarken, portföyünüz altının getirisini <strong>{goldDiff >= 0 ? `+%${goldDiff.toFixed(1)}` : `-%${Math.abs(goldDiff).toFixed(1)}`}</strong> fark ile takip etmiştir.
+                                    </p>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '0.75rem', background: 'rgba(245, 158, 11, 0.05)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(245, 158, 11, 0.1)' }}>
+                                      <Info size={14} style={{ color: '#f59e0b', flexShrink: 0 }} />
+                                      <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
+                                        Altın küresel ons ve döviz seyrini takip ederken, sepetinizdeki teknoloji, hisse senedi ve serbest fonlar ekstra alfa yaratma potansiyeline sahiptir.
+                                      </span>
+                                    </div>
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     )}
