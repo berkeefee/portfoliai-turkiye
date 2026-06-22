@@ -2292,10 +2292,21 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                       ))}
                     </div>
 
-                    {/* Dynamic SVG line chart */}
-                    {analysisResult.backtest?.monthlyData && (
-                      <div>
-                        {/* CSS animations inject */}
+                    {analysisResult.backtest?.monthlyData && (() => {
+                      const mData = analysisResult.backtest.monthlyData;
+                      const defaultBistVals = [100.0, 98.4, 87.1, 81.9, 89.9, 103.4, 124.6, 124.6, 121.7, 123.5, 125.9, 136.9];
+                      const defaultGoldVals = [100.0, 101.8, 112.4, 130.0, 132.0, 139.9, 152.5, 169.6, 160.4, 159.6, 156.1, 150.0];
+                      const bistData = (analysisResult.backtest.bist100Data && analysisResult.backtest.bist100Data.length > 0)
+                        ? analysisResult.backtest.bist100Data 
+                        : mData.map((d, idx) => ({ date: d.date, value: defaultBistVals[idx] || 100.0 }));
+                      const goldData = (analysisResult.backtest.goldData && analysisResult.backtest.goldData.length > 0)
+                        ? analysisResult.backtest.goldData 
+                        : mData.map((d, idx) => ({ date: d.date, value: defaultGoldVals[idx] || 100.0 }));
+                      const bistRet = bistData.length > 0 ? Math.round(bistData[bistData.length - 1].value - 100) : 37;
+                      const goldRet = goldData.length > 0 ? Math.round(goldData[goldData.length - 1].value - 100) : 50;
+                      return (
+                        <div>
+                          {/* CSS animations inject */}
                         <style dangerouslySetInnerHTML={{__html: `
                           @keyframes drawLine {
                             to { stroke-dashoffset: 0; }
@@ -2443,20 +2454,20 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                             <div className="legend-item">
                               <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }} />
                               <span>Yapay Zeka Sepeti:</span>
-                              <strong style={{ color: '#10b981' }}>%{analysisResult.backtest.totalReturn}%</strong>
+                              <strong style={{ color: '#10b981' }}>%{analysisResult.backtest.totalReturn}</strong>
                             </div>
                             {(backtestCompareMode === 'all' || backtestCompareMode === 'bist') && (
                               <div className="legend-item">
                                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#3b82f6', display: 'inline-block', boxShadow: '0 0 6px #3b82f6' }} />
                                 <span>BIST 100 Endeksi:</span>
-                                <strong style={{ color: '#3b82f6' }}>%48.0%</strong>
+                                <strong style={{ color: '#3b82f6' }}>%{bistRet}</strong>
                               </div>
                             )}
                             {(backtestCompareMode === 'all' || backtestCompareMode === 'gold') && (
                               <div className="legend-item">
                                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b', display: 'inline-block', boxShadow: '0 0 6px #f59e0b' }} />
                                 <span>Saf Altın (Ons):</span>
-                                <strong style={{ color: '#f59e0b' }}>%42.5%</strong>
+                                <strong style={{ color: '#f59e0b' }}>%{goldRet}</strong>
                               </div>
                             )}
                           </div>
@@ -2464,9 +2475,6 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
 
                         <div className="glass-card" style={{ background: 'rgba(0,0,0,0.22)', padding: '1.25rem', border: '1px solid var(--border-glass)' }}>
                           {(() => {
-                            const mData = analysisResult.backtest.monthlyData;
-                            const bistData = analysisResult.backtest.bist100Data || [];
-                            const goldData = analysisResult.backtest.goldData || [];
                             
                             const allVals = [
                               ...mData.map(d => d.value),
@@ -2758,12 +2766,8 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                           
                           {(() => {
                             const portRet = analysisResult.backtest?.totalReturn || 0;
-                            const bistRet = bistData.length > 0 ? Math.round(bistData[bistData.length - 1].value - 100) : 36.9;
-                            const goldRet = goldData.length > 0 ? Math.round(goldData[goldData.length - 1].value - 100) : 50.0;
-
                             const bistDiff = portRet - bistRet;
                             const goldDiff = portRet - goldRet;
-
                             const isWinner = portRet > bistRet && portRet > goldRet;
 
                             return (
@@ -2822,8 +2826,9 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                           })()}
                         </div>
                       </div>
-                    )}
-                  </div>
+                    );
+                  })()}
+                </div>
 
                   {/* Monte Carlo Simulator Card */}
                   <div className="glass-card" style={{ padding: '1.25rem' }}>
