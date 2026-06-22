@@ -233,6 +233,7 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
 
   const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
   const [showKvkkModal, setShowKvkkModal] = useState<boolean>(false);
+  const [showPremiumModal, setShowPremiumModal] = useState<boolean>(false);
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
     report: true,
     portfolio: false,
@@ -380,28 +381,9 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
 
   const currentRisk = getRiskDetails(riskLevel);
 
-  // Apply rebalancing optimization
+  // Apply rebalancing optimization (Premium upgrade prompt)
   const handleApplyOptimization = () => {
-    if (analysisResult && analysisResult.optimization.optimized_portfolio.length > 0) {
-      // Create new weights
-      const optimizedItems = analysisResult.optimization.optimized_portfolio.map(p => ({
-        code: p.code,
-        weight: p.weight
-      }));
-
-      // Simulate load
-      setAnalysisResult(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          portfolio: optimizedItems,
-          optimization: {
-            ...prev.optimization,
-            changes_summary: ["Önerilen rebalans portföye uygulandı. Varlık dağılımları optimize edildi."]
-          }
-        };
-      });
-    }
+    setShowPremiumModal(true);
   };
 
   // Run Orchestrator Pipeline
@@ -3208,7 +3190,7 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                     style={{ fontSize: '0.775rem', padding: '0px 14px', height: '34px', display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}
                     onClick={handleApplyOptimization}
                   >
-                    <RefreshCw size={12} /> Optimize Ağırlıkları Uygula
+                    <Zap size={12} style={{ fill: 'currentColor' }} /> Optimize Ağırlıkları Uygula (Premium)
                   </button>
                 </div>
               )}
@@ -3315,10 +3297,93 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
               <p>Girdiğiniz finansal simülasyon parametreleri, yalnızca yapay zeka ajanları vasıtasıyla size özel portföy önerileri ve rebalans analizleri üretmek amacıyla anlık olarak işlenir ve saklanmaz.</p>
               
               <h3>3. Verilerin Aktarılması</h3>
-              <p>Finansal simülasyon tercihleriniz analiz edilmek üzere Google Gemini API sistemine anlık olarak aktarılır. Bu aktarım sırasında kimliğinizi doğrudan veya dolaylı olarak belirleyecek hiçbir kişisel veri (ad, e-posta, IP vb.) Gemini sunucularına iletilmez. Bu nedenle KVKK Madde 9 kapsamında sınır ötesi kişisel veri aktarımı söz konusu değildir.</p>
+              <p>Finansal simülasyon tercihleriniz analiz edilmek üzere Google Gemini API sistemine anlık olarak aktarılır. Bu aktarım sırasında kimliğinizi doğrudan veya dolaylı olarak belirleyecek hiçbir kişisel veri (ad, e-posta, IP vb.) Gemini sunucularına iletelmez. Bu nedenle KVKK Madde 9 kapsamında sınır ötesi kişisel veri aktarımı söz konusu değildir.</p>
               
               <h3>4. Haklarınız</h3>
               <p>Uygulama hiçbir kişisel veriyi kaydetmediği için, KVKK Madde 11 kapsamında hak talebine konu olabilecek bir kişisel veri arşivimiz bulunmamaktadır. Her türlü sorunuz için bizimle iletişime geçebilirsiniz.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPremiumModal && (
+        <div className="modal-overlay" onClick={() => setShowPremiumModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{
+            background: 'linear-gradient(135deg, #0a0a0a 0%, #171717 100%)',
+            border: '1px solid rgba(197, 160, 89, 0.35)',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.85), 0 0 30px rgba(197, 160, 89, 0.15)',
+            maxWidth: '480px'
+          }}>
+            <div className="modal-header" style={{ borderBottom: '1px dashed rgba(197, 160, 89, 0.25)', paddingBottom: '1rem' }}>
+              <h2 style={{ color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.25rem', fontWeight: 800 }}>
+                <Zap style={{ fill: 'var(--accent-gold)', color: 'var(--accent-gold)' }} size={20} />
+                Çalışkan Borsa Premium
+              </h2>
+              <button className="modal-close" onClick={() => setShowPremiumModal(false)} style={{ color: 'var(--text-muted)' }}>&times;</button>
+            </div>
+            <div className="modal-body" style={{ textAlign: 'center', padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{
+                background: 'rgba(197, 160, 89, 0.08)',
+                borderRadius: '50%',
+                width: '64px',
+                height: '64px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto',
+                border: '1px solid rgba(197, 160, 89, 0.25)',
+                boxShadow: '0 0 15px rgba(197, 160, 89, 0.1)'
+              }}>
+                <TrendingUp size={32} style={{ color: 'var(--accent-gold)' }} />
+              </div>
+              
+              <div>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>Optimum Ağırlıkları Uygulayın</h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                  Piyasa rejimine göre optimize edilmiş taktiksel rebalans ağırlıklarını tek tıkla portföyünüze uygulamak ve portföyünüzün uyum puanını yükseltmek <strong>Premium</strong> üyeliğe özeldir.
+                </p>
+              </div>
+
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: '8px',
+                padding: '0.75rem 1rem',
+                textAlign: 'left',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  <span style={{ color: 'var(--accent-gold)' }}>✔</span> <span>Tek Tıkla Taktiksel Rebalans Uygulama</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  <span style={{ color: 'var(--accent-gold)' }}>✔</span> <span>12 Farklı Kriz Senaryosu & Stres Testi</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  <span style={{ color: 'var(--accent-gold)' }}>✔</span> <span>WhatsApp & SMS Anlık Risk Alarmları</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '0.5rem' }}>
+                <button 
+                  className="btn btn-accent" 
+                  style={{ width: '100%', height: '42px', fontSize: '0.85rem', fontWeight: 700, margin: 0, boxShadow: '0 4px 12px rgba(197, 160, 89, 0.2)' }}
+                  onClick={() => {
+                    setShowPremiumModal(false);
+                    alert("Çalışkan Borsa Premium Aboneliği şu anda simülasyon aşamasındadır. Gösterdiğiniz ilgi için teşekkür ederiz!");
+                  }}
+                >
+                  Premium'a Yükselt (299 TL / ay)
+                </button>
+                <button 
+                  className="btn" 
+                  style={{ width: '100%', height: '36px', fontSize: '0.8rem', background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.08)', color: 'var(--text-muted)', margin: 0 }}
+                  onClick={() => setShowPremiumModal(false)}
+                >
+                  Daha Sonra
+                </button>
+              </div>
             </div>
           </div>
         </div>
