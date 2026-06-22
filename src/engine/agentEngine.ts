@@ -136,7 +136,7 @@ export interface AgentSystemResult {
   overlap: OverlapAnalyzerOutput;
   regime: MarketRegimeOutput;
   optimization: OptimizationOutput;
-  finalAdvisorReport: string;
+  finalReport: string;
   healthScores?: HealthScoresOutput;
   advancedRiskMetrics?: AdvancedRiskMetrics;
   scenarios?: Record<string, ScenarioImpact>;
@@ -224,8 +224,8 @@ Output format MUST be structured JSON:
 Rules:
 - Classify regimes and detail portfolio implications`,
 
-  PORTFOLIO_ADVISOR: `🎯 Role: Final Explainer (User Facing)
-You are the Portfolio Insight Advisor.
+  PORTFOLIO_EXPLAINER: `🎯 Role: Final Explainer (User Facing)
+You are the Portfolio Insight Explainer.
 You receive outputs from: Data Agent, Risk Agent, Overlap Agent, Market Regime Agent.
 Your job:
 1. Explain in simple language why this portfolio was created for this client based on their risk level, goal, and horizon.
@@ -965,9 +965,9 @@ export function runLocalAnalysis(
 }
 
 
-// Generates simulation advisor response using templates matching risk level
-export function generateSimulationAdvisorReport(
-  analysis: Omit<AgentSystemResult, 'finalAdvisorReport' | 'logs'>,
+// Generates simulation response using templates matching risk level
+export function generateSimulationReport(
+  analysis: Omit<AgentSystemResult, 'finalReport' | 'logs'>,
   riskLevel: number,
   investmentGoal: string,
   horizon: string
@@ -1253,9 +1253,9 @@ export async function runLiveAgentAnalysis(
     addLog('Optimization Agent (Fallback)', 'Portfolio Optimizer', optAgentPrompt, `Error: ${error?.message || error}. Fallback value:\n${JSON.stringify(optResult, null, 2)}`, 'failed');
   }
 
-  // 6. PORTFOLIO ADVISOR AGENT
+  // 6. PORTFOLIO EXPLAINER AGENT
   const textModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-  const advisorPrompt = `${AGENT_PROMPTS.PORTFOLIO_ADVISOR}
+  const explainerPrompt = `${AGENT_PROMPTS.PORTFOLIO_EXPLAINER}
   
   CLIENT PROFILE:
   - Risk Level: ${riskLevel}/10
@@ -1274,18 +1274,18 @@ export async function runLiveAgentAnalysis(
   MARKET REGIME:
   ${JSON.stringify(marketResult, null, 2)}
   
-  Write a comprehensive investment advisor report in Turkish, explaining WHY these funds were selected, why the weights fit their profile, and what risks/conditions to watch. Follow the requested headings. Output markdown.`;
+  Write a comprehensive investment report in Turkish, explaining WHY these funds were selected, why the weights fit their profile, and what risks/conditions to watch. Follow the requested headings. Output markdown.`;
 
   let finalReport = '';
   try {
-    addLog('Portfolio Advisor Agent', 'Final Explainer (User Facing)', advisorPrompt, 'Running API request...', 'running');
-    const result = await textModel.generateContent(advisorPrompt);
+    addLog('Portfolio Explainer Agent', 'Final Explainer (User Facing)', explainerPrompt, 'Running API request...', 'running');
+    const result = await textModel.generateContent(explainerPrompt);
     finalReport = result.response.text();
-    addLog('Portfolio Advisor Agent', 'Final Explainer (User Facing)', advisorPrompt, finalReport, 'success');
+    addLog('Portfolio Explainer Agent', 'Final Explainer (User Facing)', explainerPrompt, finalReport, 'success');
   } catch (error: any) {
-    console.error('Advisor Agent failed, using local fallback:', error);
-    finalReport = generateSimulationAdvisorReport(localAnalysis, riskLevel, investmentGoal, horizon);
-    addLog('Portfolio Advisor Agent (Fallback)', 'Final Explainer (User Facing)', advisorPrompt, `Error: ${error?.message || error}. Generated fallback report:\n${finalReport}`, 'failed');
+    console.error('Explainer Agent failed, using local fallback:', error);
+    finalReport = generateSimulationReport(localAnalysis, riskLevel, investmentGoal, horizon);
+    addLog('Portfolio Explainer Agent (Fallback)', 'Final Explainer (User Facing)', explainerPrompt, `Error: ${error?.message || error}. Generated fallback report:\n${finalReport}`, 'failed');
   }
 
   return {
@@ -1296,7 +1296,7 @@ export async function runLiveAgentAnalysis(
     overlap: overlapResult,
     regime: marketResult,
     optimization: optResult,
-    finalAdvisorReport: finalReport,
+    finalReport: finalReport,
     healthScores: localAnalysis.healthScores,
     advancedRiskMetrics: localAnalysis.advancedRiskMetrics,
     scenarios: localAnalysis.scenarios,

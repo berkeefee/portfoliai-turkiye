@@ -66,6 +66,8 @@ function MagicLinkForm({ variant = 'hero' }: { variant?: 'hero' | 'contact' }) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const [kvkkAccepted, setKvkkAccepted] = useState(false)
+  const [showKvkk, setShowKvkk] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -167,6 +169,90 @@ function MagicLinkForm({ variant = 'hero' }: { variant?: 'hero' | 'contact' }) {
           )}
         </motion.button>
       </div>
+
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginTop: '12px', textAlign: 'left' }}>
+        <input 
+          type="checkbox" 
+          id="kvkk-check-form" 
+          checked={kvkkAccepted} 
+          onChange={(e) => setKvkkAccepted(e.target.checked)} 
+          style={{ accentColor: '#c5a059', marginTop: '3px', cursor: 'pointer' }}
+          required
+        />
+        <label htmlFor="kvkk-check-form" style={{ fontSize: '0.725rem', color: '#a3a3a3', lineHeight: 1.35, cursor: 'pointer' }}>
+          Giriş yaparak, e-posta adresimin portföy analizlerimi veritabanında saklayabilmek amacıyla işlenmesini ve <span 
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowKvkk(true); }}
+            style={{ color: '#c5a059', textDecoration: 'underline', fontWeight: 600 }}
+          >KVKK Aydınlatma Metni</span> koşullarını kabul ediyorum.
+        </label>
+      </div>
+
+      {showKvkk && (
+        <div 
+          onClick={() => setShowKvkk(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '1rem'
+          }}
+        >
+          <div 
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: '#0d0f14',
+              border: '1px solid rgba(197, 160, 89, 0.2)',
+              borderRadius: '16px',
+              maxWidth: '550px',
+              width: '100%',
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              boxShadow: '0 24px 48px rgba(0,0,0,0.8)',
+              padding: '1.5rem',
+              color: '#fff',
+              fontSize: '0.825rem',
+              lineHeight: 1.5,
+              position: 'relative',
+              textAlign: 'left'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#c5a059', fontWeight: 700 }}>KVKK Aydınlatma Metni</h3>
+              <button 
+                onClick={() => setShowKvkk(false)}
+                style={{ background: 'none', border: 'none', color: '#a3a3a3', fontSize: '1.5rem', cursor: 'pointer', padding: '0 6px' }}
+              >
+                &times;
+              </button>
+            </div>
+            <div>
+              <p><strong>Çalışkan Borsa Kişisel Verilerin Korunması ve Gizlilik Bildirimi</strong></p>
+              <p>6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") kapsamında, bu web uygulaması üzerinde gerçekleştirdiğiniz işlemlerin veri gizliliğine ilişkin açıklamalar aşağıda yer almaktadır:</p>
+              
+              <h4 style={{ color: '#c5a059', margin: '1rem 0 0.5rem 0', fontSize: '0.875rem', fontWeight: 700 }}>1. Veri Sorumlusu</h4>
+              <p>Bu uygulama bir simülasyon ve yapay zeka analiz aracı olup, kişisel veri toplayan veya işleyen herhangi bir merkezi veri tabanına sahip değildir.</p>
+              
+              <h4 style={{ color: '#c5a059', margin: '1rem 0 0.5rem 0', fontSize: '0.875rem', fontWeight: 700 }}>2. İşlenen Veriler ve Amaçları</h4>
+              <p>Uygulamayı kullanırken girdiğiniz parametreler (Risk toleransı, yatırım amacı, vade tercihleri ve fon dağılımları) tamamen anonim niteliktedir. E-posta adresiniz ise sadece giriş bağlantısı gönderimi ve portföyünüzün otomatik kaydedilerek korunması amacıyla işlenir.</p>
+              
+              <h4 style={{ color: '#c5a059', margin: '1rem 0 0.5rem 0', fontSize: '0.875rem', fontWeight: 700 }}>3. Verilerin Aktarılması</h4>
+              <p>Finansal simülasyon tercihleriniz analiz edilmek üzere Google Gemini API sistemine aktarılır. Bu aktarım sırasında kimliğinizi doğrudan veya dolaylı olarak belirleyecek hiçbir kişisel veri (ad, e-posta, IP vb.) Gemini sunucularına iletilmez.</p>
+              
+              <h4 style={{ color: '#c5a059', margin: '1rem 0 0.5rem 0', fontSize: '0.875rem', fontWeight: 700 }}>4. Haklarınız</h4>
+              <p>KVKK Madde 11 kapsamındaki hak talepleriniz ve diğer sorularınız için her zaman bizimle iletişime geçebilirsiniz.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <AnimatePresence>
         {status !== 'idle' && status !== 'loading' && (
           <motion.p

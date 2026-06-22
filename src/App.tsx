@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { 
   runLocalAnalysis, 
-  generateSimulationAdvisorReport,
+  generateSimulationReport,
   TURKEY_MACRO_SIGNALS
 } from './engine/agentEngine';
 import type { 
@@ -586,15 +586,15 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
       ]);
 
       await delay(1500);
-      setActiveAgentIndex(6); // Advisor Agent active
-      const finalReportText = generateSimulationAdvisorReport(localResult, rL, iG, hz);
+      setActiveAgentIndex(6); // Explainer Agent active
+      const finalReportText = generateSimulationReport(localResult, rL, iG, hz);
       setLogs(prev => [
         ...prev,
         {
-          agentName: 'Portfolio Advisor Agent',
+          agentName: 'Portfolio Explainer Agent',
           role: 'Final Explainer (User Facing)',
           status: 'success',
-          promptSent: 'Müşteri profiline özel nihai tavsiye ve gerekçe raporu Türkçe dilinde derleniyor...',
+          promptSent: 'Müşteri profiline özel nihai açıklama ve gerekçe raporu Türkçe dilinde derleniyor...',
           outputReceived: finalReportText,
           timestamp: new Date().toISOString()
         }
@@ -603,7 +603,7 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
       setAnalysisResult({
         ...localResult,
         logs: [],
-        finalAdvisorReport: finalReportText
+        finalReport: finalReportText
       });
       setIsRunning(false);
       setActiveAgentIndex(-1);
@@ -657,7 +657,7 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                 else if (newLog.agentName.includes('Overlap')) setActiveAgentIndex(3);
                 else if (newLog.agentName.includes('Regime')) setActiveAgentIndex(4);
                 else if (newLog.agentName.includes('Optimization') || newLog.agentName.includes('Optimizer')) setActiveAgentIndex(5);
-                else if (newLog.agentName.includes('Advisor')) setActiveAgentIndex(6);
+                else if (newLog.agentName.includes('Explainer') || newLog.agentName.includes('Report')) setActiveAgentIndex(6);
               } else if (data.type === 'result') {
                 setActiveAgentIndex(-1);
                 setAnalysisResult(data.result);
@@ -680,7 +680,7 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
 
 
   // Helper to parse markdown
-  const renderAdvisorReport = (markdownText: string) => {
+  const renderReport = (markdownText: string) => {
     const sections = markdownText.split(/(?=### )/);
     
     return sections.map((sec, idx) => {
@@ -719,7 +719,7 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
               {icon} {titleText}
             </h3>
           )}
-          <div className="advisor-report-body" style={{ color: '#cbd5e1', fontSize: '0.925rem' }}>
+          <div className="report-body" style={{ color: '#cbd5e1', fontSize: '0.925rem' }}>
             {contentLines.map((line, lIdx) => {
               if (line.trim().startsWith('-')) {
                 const listText = line.replace('-', '').trim();
@@ -3091,13 +3091,27 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                     </div>
                   </div>
 
-                  {/* Advisor Report details (Gemini Report Markdown) */}
+                  {/* Report details (Gemini Report Markdown) */}
                   <div className="glass-card" style={{ padding: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'var(--accent-gold)', borderBottom: '1px solid var(--border-glass)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
                       <span style={{ fontSize: '0.9rem', fontWeight: 700 }}>Detaylı Taktiksel AI Analiz Raporu</span>
                     </div>
                     <div className="advisor-report">
-                      {renderAdvisorReport(analysisResult.finalAdvisorReport)}
+                      {renderReport(analysisResult.finalReport)}
+                    </div>
+                    
+                    {/* SPK Disclaimer */}
+                    <div style={{
+                      marginTop: '1.25rem',
+                      padding: '0.85rem 1rem',
+                      borderTop: '1px solid var(--border-glass)',
+                      fontSize: '0.725rem',
+                      color: 'var(--text-muted)',
+                      lineHeight: 1.4,
+                      textAlign: 'justify'
+                    }}>
+                      <span style={{ color: 'var(--accent-gold)', fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>SPK UYARI NOTU:</span>
+                      Burada yer alan yatırım bilgi, yorum ve tavsiyeleri yatırım danışmanlığı kapsamında değildir. Yatırım danışmanlığı hizmeti; aracı kurumlar, portföy yönetim şirketleri, mevduat kabul etmeyen bankalar ile müşteri arasında imzalanacak yatırım danışmanlığı sözleşmesi çerçevesinde sunulmaktadır. Burada yer alan yorum ve tavsiyeler, yorum ve tavsiyede bulunanların kişisel görüşlerine dayanmaktadır. Bu görüşler mali durumunuz ile risk ve getiri tercihlerinize uygun olmayabilir. Bu nedenle, sadece burada yer alan bilgilere dayanılarak yatırım kararı verilmesi beklentilerinize uygun sonuçlar doğurmayabilir.
                     </div>
                   </div>
                 </div>
@@ -3313,41 +3327,47 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
 
         </div>
 
-        <div className="seo-footer-bottom">
-          <span>© 2026 Çalışkan Borsa. Tüm hakları saklıdır. Bu platform yatırım tavsiyesi sunmaz; yalnızca eğitim ve analiz amaçlıdır.</span>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <a href="https://portfolio-ai.com.tr/" target="_blank" rel="noopener noreferrer">Ana Sayfa</a>
-            <a href="https://portfolio-ai.com.tr/sitemap.xml" target="_blank" rel="noopener noreferrer">Sitemap</a>
-            <a 
-              href="https://x.com/caliskanborsa6" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-            >
-              <svg 
-                viewBox="0 0 24 24" 
-                width="14" 
-                height="14" 
-                fill="currentColor"
-                style={{ display: 'inline-block', verticalAlign: 'middle' }}
+        <div className="seo-footer-bottom" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
+          <div style={{ width: '100%', fontSize: '0.675rem', color: 'rgba(255, 255, 255, 0.4)', lineHeight: 1.4, textAlign: 'justify', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '0.75rem' }}>
+            <span style={{ color: 'var(--accent-gold)', fontWeight: 'bold' }}>YASAL UYARI: </span>
+            Burada yer alan yatırım bilgi, yorum ve tavsiyeleri yatırım danışmanlığı kapsamında değildir. Yatırım danışmanlığı hizmeti; aracı kurumlar, portföy yönetim şirketleri, mevduat kabul etmeyen bankalar ile müşteri arasında imzalanacak yatırım danışmanlığı sözleşmesi çerçevesinde sunulmaktadır. Burada yer alan yorum ve tavsiyeler, yorum ve tavsiyede bulunanların kişisel görüşlerine dayanmaktadır. Bu görüşler mali durumunuz ile risk ve getiri tercihlerinize uygun olmayabilir. Bu nedenle, sadece burada yer alan bilgilere dayanılarak yatırım kararı verilmesi beklentilerinize uygun sonuçlar doğurmayabilir.
+          </div>
+          <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', fontSize: '0.75rem' }}>
+            <span>© 2026 Çalışkan Borsa. Tüm hakları saklıdır. Bu platform yatırım tavsiyesi sunmaz; yalnızca eğitim ve analiz amaçlıdır.</span>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <a href="https://portfolio-ai.com.tr/" target="_blank" rel="noopener noreferrer">Ana Sayfa</a>
+              <a href="https://portfolio-ai.com.tr/sitemap.xml" target="_blank" rel="noopener noreferrer">Sitemap</a>
+              <a 
+                href="https://x.com/caliskanborsa6" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
-                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
-              </svg> Twitter (X)
-            </a>
-            <button 
-              onClick={() => setShowKvkkModal(true)} 
-              style={{ 
-                background: 'none', 
-                border: 'none', 
-                color: 'var(--accent-gold)', 
-                cursor: 'pointer', 
-                fontFamily: 'inherit', 
-                fontSize: 'inherit',
-                padding: 0 
-              }}
-            >
-              KVKK Aydınlatma Metni
-            </button>
+                <svg 
+                  viewBox="0 0 24 24" 
+                  width="14" 
+                  height="14" 
+                  fill="currentColor"
+                  style={{ display: 'inline-block', verticalAlign: 'middle' }}
+                >
+                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                </svg> Twitter (X)
+              </a>
+              <button 
+                onClick={() => setShowKvkkModal(true)} 
+                style={{ 
+                  background: 'none', 
+                  border: 'none', 
+                  color: 'var(--accent-gold)', 
+                  cursor: 'pointer', 
+                  fontFamily: 'inherit', 
+                  fontSize: 'inherit',
+                  padding: 0 
+                }}
+              >
+                KVKK Aydınlatma Metni
+              </button>
+            </div>
           </div>
         </div>
       </footer>
