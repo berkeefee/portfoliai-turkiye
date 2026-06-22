@@ -89,6 +89,7 @@ export default function App() {
   // -------------------------------------------------------------
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(supabaseConfigured);
+  const [showLogin, setShowLogin] = useState<boolean>(false);
 
   useEffect(() => {
     if (!supabaseConfigured) return;
@@ -123,17 +124,17 @@ export default function App() {
     );
   }
 
-  // Show LandingPage if not authenticated (or if Supabase is not configured)
-  if (!user) {
-    return <LandingPage />;
+  // Show LandingPage if not authenticated and showLogin is true
+  if (showLogin && !user) {
+    return <LandingPage onBack={() => setShowLogin(false)} />;
   }
 
-  // If authenticated, show dashboard
-  return <Dashboard user={user} />;
+  // If authenticated or bypassing login, show dashboard
+  return <Dashboard user={user} onLoginClick={() => setShowLogin(true)} />;
 }
 
 // Wrap existing dashboard in its own component
-function Dashboard({ user }: { user: User }) {
+function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: () => void }) {
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
@@ -151,6 +152,10 @@ function Dashboard({ user }: { user: User }) {
 
   // Load saved portfolio from database on mount
   useEffect(() => {
+    if (!user) {
+      setIsInitialLoad(false);
+      return;
+    }
     const loadSavedPortfolio = async () => {
       try {
         const { data, error } = await supabase
@@ -173,7 +178,7 @@ function Dashboard({ user }: { user: User }) {
     };
 
     loadSavedPortfolio();
-  }, [user.id]);
+  }, [user?.id]);
 
   // Debounced auto-save effect
   useEffect(() => {
@@ -773,25 +778,47 @@ function Dashboard({ user }: { user: User }) {
               <ArrowLeft size={14} /> Ana Sayfa
             </button>
           )}
-          <button
-            className="btn btn-icon"
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid var(--border-glass-active)',
-              color: '#f87171',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-            }}
-            onClick={handleLogout}
-            title="Çıkış Yap"
-          >
-            <LogOut size={14} />
-          </button>
+          {user ? (
+            <button
+              className="btn btn-icon"
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid var(--border-glass-active)',
+                color: '#f87171',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+              onClick={handleLogout}
+              title="Çıkış Yap"
+            >
+              <LogOut size={14} />
+            </button>
+          ) : (
+            <button
+              className="btn"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '0.5rem 1rem',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%)',
+                color: '#000',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+              onClick={onLoginClick}
+            >
+              <UserCheck size={14} /> Giriş Yap
+            </button>
+          )}
           <a 
             href="https://x.com/caliskanborsa6" 
             target="_blank" 

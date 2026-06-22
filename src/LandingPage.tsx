@@ -236,7 +236,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 /* ═══════════════════════════════════════════════
    ─── LANDING PAGE ───
    ═══════════════════════════════════════════════ */
-export default function LandingPage() {
+export default function LandingPage({ onBack }: { onBack?: () => void }) {
   const features = [
     { icon: BarChart3, title: 'Akıllı Sağlık Karnesi', desc: 'Portföyünüzün çeşitlendirme oranını, getiri potansiyelini ve genel sağlık durumunu anında puanlayın.' },
     { icon: Shield, title: 'Risk & Stres Testleri', desc: 'Piyasadaki olası sert düşüş senaryolarında portföyünüzün ne kadar kayıp yaşayabileceğini simüle edin.' },
@@ -323,9 +323,28 @@ export default function LandingPage() {
               <a key={href} href={href} className="landing-nav-link" style={{ color: '#a3a3a3', textDecoration: 'none', transition: 'color 0.3s' }}>{label}</a>
             ))}
           </div>
-          <a href="#giris" style={{ padding: '8px 16px', fontSize: '0.875rem', fontWeight: 500, background: 'rgba(13, 15, 20, 0.85)', border: '1px solid rgba(197, 160, 89, 0.12)', borderRadius: '8px', color: '#fff', textDecoration: 'none', transition: 'border-color 0.3s' }}>
-            Giriş Yap
-          </a>
+          {onBack ? (
+            <button
+              onClick={onBack}
+              style={{
+                padding: '8px 16px',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                background: 'linear-gradient(135deg, #c5a059 0%, #f3dcb3 100%)',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#000',
+                cursor: 'pointer',
+                transition: 'all 0.3s'
+              }}
+            >
+              Paneli Görüntüle
+            </button>
+          ) : (
+            <a href="#giris" style={{ padding: '8px 16px', fontSize: '0.875rem', fontWeight: 500, background: 'rgba(13, 15, 20, 0.85)', border: '1px solid rgba(197, 160, 89, 0.12)', borderRadius: '8px', color: '#fff', textDecoration: 'none', transition: 'border-color 0.3s' }}>
+              Giriş Yap
+            </a>
+          )}
         </div>
       </motion.nav>
 
