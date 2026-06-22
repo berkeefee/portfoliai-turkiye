@@ -1,0 +1,14 @@
+{
+  "tcmbRate": 37.0,
+  "tcmbStatus": "YÜKSEK",
+  "tcmbDescription": "TCMB Politika Faizi: %37 seviyesinde olup sıkı para politikası duruşu korunmaktadır.",
+  "inflation": 32.61,
+  "inflationStatus": "DÜŞÜŞTE",
+  "inflationDescription": "Yıllık enflasyonda sıkılaşma ve baz etkisiyle düşüş eğilimi devam etmektedir.",
+  "bist100Fallback": 14791,
+  "bistStatus": "YÜKSEK",
+  "bistDescription": "BIST-100 endeksi 14,000 seviyesinin üzerinde yükseliş trendinde olup seçici hisse hareketleri ön plandadır.",
+  "fundFlows": "Dengeli",
+  "fundFlowsStatus": "STABİL",
+  "fundFlowsDescription": "Para piyasası fonları ve yabancı tematik fonlara seçici girişler olmakla beraber genel fon akışları stabildir."
+}

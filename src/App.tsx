@@ -234,6 +234,62 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
   const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
   const [showKvkkModal, setShowKvkkModal] = useState<boolean>(false);
   const [showPremiumModal, setShowPremiumModal] = useState<boolean>(false);
+  const [macroSignals, setMacroSignals] = useState({
+    tcmbRate: 37.0,
+    tcmbStatus: "YÜKSEK",
+    tcmbDescription: "TCMB Politika Faizi: %37 seviyesinde olup sıkı para politikası duruşu korunmaktadır.",
+    inflation: 32.61,
+    inflationStatus: "DÜŞÜŞTE",
+    inflationDescription: "Yıllık enflasyonda sıkılaşma ve baz etkisiyle düşüş eğilimi devam etmektedir.",
+    bist100: 14791,
+    bistStatus: "YÜKSEK",
+    bistDescription: "BIST-100 endeksi 14,000 seviyesinin üzerinde yükseliş trendinde olup seçici hisse hareketleri ön plandadır.",
+    fundFlows: "Dengeli",
+    fundFlowsStatus: "STABİL",
+    fundFlowsDescription: "Para piyasası fonları ve yabancı tematik fonlara seçici girişler olmakla beraber genel fon akışları stabildir."
+  });
+
+  useEffect(() => {
+    fetch('/macro-signals.json')
+      .then(res => res.json())
+      .then(staticData => {
+        if (staticData && staticData.tcmbRate) {
+          setMacroSignals(prev => ({
+            ...prev,
+            tcmbRate: staticData.tcmbRate,
+            tcmbStatus: staticData.tcmbStatus,
+            tcmbDescription: staticData.tcmbDescription,
+            inflation: staticData.inflation,
+            inflationStatus: staticData.inflationStatus,
+            inflationDescription: staticData.inflationDescription,
+            bist100: staticData.bist100Fallback,
+            bistStatus: staticData.bistStatus,
+            bistDescription: staticData.bistDescription,
+            fundFlows: staticData.fundFlows,
+            fundFlowsStatus: staticData.fundFlowsStatus,
+            fundFlowsDescription: staticData.fundFlowsDescription
+          }));
+        }
+
+        // Live BIST-100 fetch
+        fetch('https://query1.finance.yahoo.com/v8/finance/chart/XU100.IS')
+          .then(res => res.json())
+          .then(liveData => {
+            const livePrice = liveData?.chart?.result?.[0]?.meta?.regularMarketPrice;
+            if (livePrice) {
+              setMacroSignals(prev => ({
+                ...prev,
+                bist100: Math.round(livePrice),
+                bistStatus: livePrice > 14000 ? "YÜKSEK" : livePrice > 12000 ? "YATAY" : "DÜŞÜK",
+                bistDescription: `BIST-100 endeksi anlık ${Math.round(livePrice).toLocaleString('tr-TR')} seviyesinde seyretmektedir.`
+              }));
+            }
+          })
+          .catch(e => console.warn("Live BIST-100 fetch failed, using fallback:", e));
+      })
+      .catch(err => console.error("Macro signals load failed:", err));
+  }, []);
+
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
     report: true,
     portfolio: false,
@@ -1070,10 +1126,15 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                     <span className="signal-card-title">TCMB Faiz Seviyesi</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--accent-red)' }}>%37</span>
-                    <span className="badge-info signal-card-badge" style={{ padding: '1px 4px', borderColor: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', background: 'rgba(239, 68, 68, 0.05)' }}>YÜKSEK</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: macroSignals.tcmbStatus === 'YÜKSEK' ? 'var(--accent-red)' : 'var(--accent-green)' }}>%{macroSignals.tcmbRate}</span>
+                    <span className="badge-info signal-card-badge" style={{ 
+                      padding: '1px 4px', 
+                      borderColor: macroSignals.tcmbStatus === 'YÜKSEK' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)', 
+                      color: macroSignals.tcmbStatus === 'YÜKSEK' ? '#ef4444' : '#10b981', 
+                      background: macroSignals.tcmbStatus === 'YÜKSEK' ? 'rgba(239, 68, 68, 0.05)' : 'rgba(16, 185, 129, 0.05)' 
+                    }}>{macroSignals.tcmbStatus}</span>
                   </div>
-                  <span className="tooltip-text">TCMB Politika Faizi: %37 seviyesinde olup sıkı para politikası duruşu korunmaktadır.</span>
+                  <span className="tooltip-text">{macroSignals.tcmbDescription}</span>
                 </div>
 
                 <div className="glass-card tooltip-container" style={{ padding: '0.75rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-glass)', borderRadius: '2px' }}>
@@ -1082,10 +1143,15 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                     <span className="signal-card-title">Enflasyon Trendi</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--accent-green)' }}>%32.61</span>
-                    <span className="badge-info signal-card-badge" style={{ padding: '1px 4px', borderColor: 'rgba(16, 185, 129, 0.2)', color: '#10b981', background: 'rgba(16, 185, 129, 0.05)' }}>DÜŞÜŞTE</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--accent-green)' }}>%{macroSignals.inflation}</span>
+                    <span className="badge-info signal-card-badge" style={{ 
+                      padding: '1px 4px', 
+                      borderColor: 'rgba(16, 185, 129, 0.2)', 
+                      color: '#10b981', 
+                      background: 'rgba(16, 185, 129, 0.05)' 
+                    }}>{macroSignals.inflationStatus}</span>
                   </div>
-                  <span className="tooltip-text">Yıllık enflasyonda sıkılaşma ve baz etkisiyle düşüş eğilimi devam etmektedir.</span>
+                  <span className="tooltip-text">{macroSignals.inflationDescription}</span>
                 </div>
 
                 <div className="glass-card tooltip-container" style={{ padding: '0.75rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-glass)', borderRadius: '2px' }}>
@@ -1094,10 +1160,14 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                     <span className="signal-card-title">BIST-100 Momentum</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>13,912</span>
-                    <span className="badge-info signal-card-badge" style={{ padding: '1px 4px', borderColor: 'rgba(255, 255, 255, 0.1)', color: 'var(--text-secondary)' }}>YATAY</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>{macroSignals.bist100.toLocaleString('tr-TR')}</span>
+                    <span className="badge-info signal-card-badge" style={{ 
+                      padding: '1px 4px', 
+                      borderColor: macroSignals.bistStatus === 'YÜKSEK' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.1)', 
+                      color: macroSignals.bistStatus === 'YÜKSEK' ? '#10b981' : 'var(--text-secondary)' 
+                    }}>{macroSignals.bistStatus}</span>
                   </div>
-                  <span className="tooltip-text">BIST-100 endeksi yatay seyretmekte olup, seçici hisse bazlı hareketler ön plana çıkmaktadır.</span>
+                  <span className="tooltip-text">{macroSignals.bistDescription}</span>
                 </div>
 
                 <div className="glass-card tooltip-container" style={{ padding: '0.75rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-glass)', borderRadius: '2px' }}>
@@ -1106,10 +1176,14 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                     <span className="signal-card-title">Net Fon Akışları</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>Dengeli</span>
-                    <span className="badge-info signal-card-badge" style={{ padding: '1px 4px', borderColor: 'rgba(255, 255, 255, 0.1)', color: 'var(--text-secondary)' }}>STABİL</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>{macroSignals.fundFlows}</span>
+                    <span className="badge-info signal-card-badge" style={{ 
+                      padding: '1px 4px', 
+                      borderColor: 'rgba(255, 255, 255, 0.1)', 
+                      color: 'var(--text-secondary)' 
+                    }}>{macroSignals.fundFlowsStatus}</span>
                   </div>
-                  <span className="tooltip-text">Para piyasası fonları ve yabancı tematik fonlara seçici girişler olmakla beraber genel fon akışları stabildir.</span>
+                  <span className="tooltip-text">{macroSignals.fundFlowsDescription}</span>
                 </div>
               </div>
             </div>
