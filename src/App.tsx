@@ -1111,7 +1111,7 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
             )}
 
             {/* Macro Settings Card */}
-            <div style={{ borderTop: '1px solid var(--border-glass)', paddingTop: '1.25rem', marginTop: '1.25rem' }}>
+            <div className="macro-analysis-panel" style={{ borderTop: '1px solid var(--border-glass)', paddingTop: '1.25rem', marginTop: '1.25rem' }}>
               <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <TrendingUp size={16} className="text-gradient-teal" /> Türkiye Makroekonomik Analiz Paneli
               </h3>

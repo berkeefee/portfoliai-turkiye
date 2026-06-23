@@ -1673,6 +1673,11 @@ body {
     overflow-wrap: break-word !important;
     word-break: break-word !important;
   }
+
+  /* Hide macro settings / macroeconomic analysis panel on mobile */
+  .macro-analysis-panel {
+    display: none !important;
+  }
 }
 
 /* Premium Chart Animations */
