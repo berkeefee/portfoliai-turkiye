@@ -17,6 +17,8 @@ import {
   Link,
   Home,
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
   LogOut
 } from 'lucide-react';
 import { 
@@ -220,6 +222,23 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
   const [logs, setLogs] = useState<AgentLog[]>([]);
   const [analysisResult, setAnalysisResult] = useState<AgentSystemResult | null>(null);
   const [activeResultTab, setActiveResultTab] = useState<'tab-saglik-karnesi' | 'tab-risk-stres' | 'tab-fon-iliskileri' | 'tab-backtest-tahmin' | 'tab-ai-analist' | 'tab-premium'>('tab-saglik-karnesi');
+
+  const tabSequence = ['tab-saglik-karnesi', 'tab-risk-stres', 'tab-fon-iliskileri', 'tab-backtest-tahmin', 'tab-ai-analist', 'tab-premium'];
+  
+  const handleNextTab = () => {
+    const currentIndex = tabSequence.indexOf(activeResultTab);
+    if (currentIndex < tabSequence.length - 1) {
+      setActiveResultTab(tabSequence[currentIndex + 1] as any);
+    }
+  };
+
+  const handlePrevTab = () => {
+    const currentIndex = tabSequence.indexOf(activeResultTab);
+    if (currentIndex > 0) {
+      setActiveResultTab(tabSequence[currentIndex - 1] as any);
+    }
+  };
+
   const [activeAuditorQuestion, setActiveAuditorQuestion] = useState<number | null>(null);
   const [premiumAlertConfig, setPremiumAlertConfig] = useState({ email: '', sms: '', volatilityAlert: true, drawdownAlert: true });
   const [hoveredAssetClass, setHoveredAssetClass] = useState<string | null>(null);
@@ -1785,6 +1804,66 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
 
               {/* Main Content Area (Right Side) */}
               <div className="results-content-area" style={{ flex: 1, minWidth: 0 }}>
+                {/* Mobile Tab Navigation Helper (Arrows) */}
+                <div 
+                  className="mobile-tab-navigation"
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid var(--border-glass)',
+                    borderRadius: '8px',
+                    padding: '0.5rem 0.75rem',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  <button
+                    className="btn"
+                    style={{
+                      padding: '4px 10px',
+                      fontSize: '0.75rem',
+                      height: '32px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      margin: 0,
+                      opacity: activeResultTab === 'tab-saglik-karnesi' ? 0.3 : 1,
+                      cursor: activeResultTab === 'tab-saglik-karnesi' ? 'not-allowed' : 'pointer'
+                    }}
+                    onClick={handlePrevTab}
+                    disabled={activeResultTab === 'tab-saglik-karnesi'}
+                  >
+                    <ChevronLeft size={14} /> Önceki
+                  </button>
+
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-gold)' }}>
+                    {activeResultTab === 'tab-saglik-karnesi' && '1/6 - Sağlık Karnesi'}
+                    {activeResultTab === 'tab-risk-stres' && '2/6 - Risk & Stres Testi'}
+                    {activeResultTab === 'tab-fon-iliskileri' && '3/6 - Fon İlişkileri'}
+                    {activeResultTab === 'tab-backtest-tahmin' && '4/6 - Backtest & Tahmin'}
+                    {activeResultTab === 'tab-ai-analist' && '5/6 - AI Analist & Denetçi'}
+                    {activeResultTab === 'tab-premium' && '6/6 - Premium Bölümü'}
+                  </span>
+
+                  <button
+                    className="btn btn-accent"
+                    style={{
+                      padding: '4px 10px',
+                      fontSize: '0.75rem',
+                      height: '32px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      margin: 0,
+                      opacity: activeResultTab === 'tab-premium' ? 0.3 : 1,
+                      cursor: activeResultTab === 'tab-premium' ? 'not-allowed' : 'pointer'
+                    }}
+                    onClick={handleNextTab}
+                    disabled={activeResultTab === 'tab-premium'}
+                  >
+                    Sonraki <ChevronRight size={14} />
+                  </button>
+                </div>
                 {/* TAB 1: SAĞLIK KARNESİ */}
                 {activeResultTab === 'tab-saglik-karnesi' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

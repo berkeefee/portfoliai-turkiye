@@ -1678,6 +1678,14 @@ body {
   .macro-analysis-panel {
     display: none !important;
   }
+
+  .mobile-tab-navigation {
+    display: flex !important;
+  }
+}
+
+.mobile-tab-navigation {
+  display: none !important;
 }
 
 /* Premium Chart Animations */
