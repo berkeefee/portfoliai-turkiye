@@ -1812,56 +1812,87 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                 <div 
                   className="mobile-tab-navigation"
                   style={{
+                    position: 'fixed',
+                    bottom: '24px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 999,
+                    display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: '8px',
-                    padding: '0.5rem 0.75rem',
-                    marginBottom: '1rem',
+                    gap: '12px',
+                    background: 'rgba(10, 11, 15, 0.9)',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    border: '1px solid rgba(197, 160, 89, 0.3)',
+                    borderRadius: '30px',
+                    padding: '6px 14px',
+                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(197, 160, 89, 0.15)',
+                    width: 'max-content',
+                    minWidth: '280px',
+                    justifyContent: 'space-between'
                   }}
                 >
                   <button
                     className="btn"
                     style={{
-                      padding: '4px 10px',
-                      fontSize: '0.75rem',
-                      height: '32px',
+                      width: '36px',
+                      height: '36px',
+                      minHeight: '36px',
+                      borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '4px',
+                      justifyContent: 'center',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      padding: 0,
                       margin: 0,
-                      cursor: 'pointer'
+                      transition: 'all 0.2s ease',
                     }}
                     onClick={handlePrevTab}
+                    title="Önceki Bölüm"
                   >
-                    <ChevronLeft size={14} /> Önceki
+                    <ChevronLeft size={18} />
                   </button>
 
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-gold)' }}>
-                    {activeResultTab === 'tab-saglik-karnesi' && '1/6 - Sağlık Karnesi'}
-                    {activeResultTab === 'tab-risk-stres' && '2/6 - Risk & Stres Testi'}
-                    {activeResultTab === 'tab-fon-iliskileri' && '3/6 - Fon İlişkileri'}
-                    {activeResultTab === 'tab-backtest-tahmin' && '4/6 - Backtest & Tahmin'}
-                    {activeResultTab === 'tab-ai-analist' && '5/6 - AI Analist & Denetçi'}
-                    {activeResultTab === 'tab-premium' && '6/6 - Premium Bölümü'}
-                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                    <span style={{ fontSize: '0.625rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' }}>
+                      Bölüm {tabSequence.indexOf(activeResultTab) + 1} / 6
+                    </span>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-gold)', whiteSpace: 'nowrap' }}>
+                      {activeResultTab === 'tab-saglik-karnesi' && 'Sağlık Karnesi'}
+                      {activeResultTab === 'tab-risk-stres' && 'Risk & Stres Testi'}
+                      {activeResultTab === 'tab-fon-iliskileri' && 'Fon İlişkileri'}
+                      {activeResultTab === 'tab-backtest-tahmin' && 'Backtest & Tahmin'}
+                      {activeResultTab === 'tab-ai-analist' && 'AI Analist & Denetçi'}
+                      {activeResultTab === 'tab-premium' && 'Premium Bölümü'}
+                    </span>
+                  </div>
 
                   <button
                     className="btn btn-accent"
                     style={{
-                      padding: '4px 10px',
-                      fontSize: '0.75rem',
-                      height: '32px',
+                      width: '36px',
+                      height: '36px',
+                      minHeight: '36px',
+                      borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '4px',
+                      justifyContent: 'center',
+                      background: 'linear-gradient(135deg, var(--accent-gold) 0%, #f3dcb3 100%)',
+                      border: 'none',
+                      color: '#000',
+                      cursor: 'pointer',
+                      padding: 0,
                       margin: 0,
-                      cursor: 'pointer'
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 8px rgba(197, 160, 89, 0.4)'
                     }}
                     onClick={handleNextTab}
+                    title="Sonraki Bölüm"
                   >
-                    Sonraki <ChevronRight size={14} />
+                    <ChevronRight size={18} />
                   </button>
                 </div>
                 {/* TAB 1: SAĞLIK KARNESİ */}
