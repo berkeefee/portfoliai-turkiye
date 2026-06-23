@@ -1662,7 +1662,7 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
       {analysisResult && (
             <div ref={resultsRef} className="glass-card results-dashboard-container" style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'row', gap: '1.5rem', minHeight: '600px' }}>
               <style dangerouslySetInnerHTML={{__html: `
-                @media (max-width: 768px) {
+                @media (max-width: 1024px) {
                   .results-dashboard-container {
                     flex-direction: column !important;
                     padding: 0.75rem !important;

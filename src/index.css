@@ -600,7 +600,7 @@ body {
   justify-content: center;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   .donut-container {
     flex-direction: column;
   }
@@ -682,7 +682,7 @@ body {
   margin-top: 1rem;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   .rebalance-grid {
     grid-template-columns: 1fr;
   }
@@ -962,7 +962,7 @@ body {
   gap: 1.5rem;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   .grid-2 {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -1271,7 +1271,7 @@ body {
    - Thumb-zone layouts and optimized mobile spacing
    - Accessible font scaling (minimum 16px for interactive/body, minimum 14px for descriptions)
    ========================================== */
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
   /* 1. App Layout Padding & Page Lock */
   html, body {
     overflow-x: hidden !important;

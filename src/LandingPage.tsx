@@ -376,7 +376,7 @@ export default function LandingPage({ onBack }: { onBack?: () => void }) {
         .landing-nav-link:hover { color: #fff !important; }
         .landing-plan:hover { transform: translateY(-6px); }
         .landing-testimonial:hover { border-color: #404040 !important; }
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
           .landing-hero-title { font-size: 2.5rem !important; }
           .landing-grid-3 { grid-template-columns: 1fr !important; }
           .landing-grid-2 { grid-template-columns: 1fr !important; }
