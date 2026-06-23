@@ -227,14 +227,18 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
   
   const handleNextTab = () => {
     const currentIndex = tabSequence.indexOf(activeResultTab);
-    if (currentIndex < tabSequence.length - 1) {
+    if (currentIndex === tabSequence.length - 1) {
+      setActiveResultTab(tabSequence[0] as any);
+    } else {
       setActiveResultTab(tabSequence[currentIndex + 1] as any);
     }
   };
 
   const handlePrevTab = () => {
     const currentIndex = tabSequence.indexOf(activeResultTab);
-    if (currentIndex > 0) {
+    if (currentIndex === 0) {
+      setActiveResultTab(tabSequence[tabSequence.length - 1] as any);
+    } else {
       setActiveResultTab(tabSequence[currentIndex - 1] as any);
     }
   };
@@ -1827,11 +1831,9 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                       alignItems: 'center',
                       gap: '4px',
                       margin: 0,
-                      opacity: activeResultTab === 'tab-saglik-karnesi' ? 0.3 : 1,
-                      cursor: activeResultTab === 'tab-saglik-karnesi' ? 'not-allowed' : 'pointer'
+                      cursor: 'pointer'
                     }}
                     onClick={handlePrevTab}
-                    disabled={activeResultTab === 'tab-saglik-karnesi'}
                   >
                     <ChevronLeft size={14} /> Önceki
                   </button>
@@ -1855,11 +1857,9 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                       alignItems: 'center',
                       gap: '4px',
                       margin: 0,
-                      opacity: activeResultTab === 'tab-premium' ? 0.3 : 1,
-                      cursor: activeResultTab === 'tab-premium' ? 'not-allowed' : 'pointer'
+                      cursor: 'pointer'
                     }}
                     onClick={handleNextTab}
-                    disabled={activeResultTab === 'tab-premium'}
                   >
                     Sonraki <ChevronRight size={14} />
                   </button>
