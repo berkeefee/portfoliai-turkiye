@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Play, 
   TrendingUp, 
@@ -222,10 +223,12 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
   const [logs, setLogs] = useState<AgentLog[]>([]);
   const [analysisResult, setAnalysisResult] = useState<AgentSystemResult | null>(null);
   const [activeResultTab, setActiveResultTab] = useState<'tab-saglik-karnesi' | 'tab-risk-stres' | 'tab-fon-iliskileri' | 'tab-backtest-tahmin' | 'tab-ai-analist' | 'tab-premium'>('tab-saglik-karnesi');
+  const [slideDirection, setSlideDirection] = useState<'next' | 'prev'>('next');
 
   const tabSequence = ['tab-saglik-karnesi', 'tab-risk-stres', 'tab-fon-iliskileri', 'tab-backtest-tahmin', 'tab-ai-analist', 'tab-premium'];
   
   const handleNextTab = () => {
+    setSlideDirection('next');
     const currentIndex = tabSequence.indexOf(activeResultTab);
     if (currentIndex === tabSequence.length - 1) {
       setActiveResultTab(tabSequence[0] as any);
@@ -235,12 +238,41 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
   };
 
   const handlePrevTab = () => {
+    setSlideDirection('prev');
     const currentIndex = tabSequence.indexOf(activeResultTab);
     if (currentIndex === 0) {
       setActiveResultTab(tabSequence[tabSequence.length - 1] as any);
     } else {
       setActiveResultTab(tabSequence[currentIndex - 1] as any);
     }
+  };
+
+  // Swipe gesture detection refs
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.changedTouches[0].clientX;
+    touchStartY.current = e.changedTouches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const diffX = touchStartX.current - touchEndX;
+    const diffY = touchStartY.current - touchEndY;
+
+    // Check if swipe is horizontal enough: |diffX| > 60 and |diffX| > |diffY| * 1.5
+    if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
+      if (diffX > 0) {
+        handleNextTab();
+      } else {
+        handlePrevTab();
+      }
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
   };
 
   const [activeAuditorQuestion, setActiveAuditorQuestion] = useState<number | null>(null);
@@ -1763,7 +1795,14 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                       transition: 'all 0.2s ease',
                       boxShadow: activeResultTab === tab.id ? 'var(--shadow-glow-gold)' : 'none'
                     }}
-                    onClick={() => setActiveResultTab(tab.id as any)}
+                    onClick={() => {
+                      const currentIndex = tabSequence.indexOf(activeResultTab);
+                      const targetIndex = tabSequence.indexOf(tab.id);
+                      if (targetIndex !== currentIndex) {
+                        setSlideDirection(targetIndex > currentIndex ? 'next' : 'prev');
+                        setActiveResultTab(tab.id as any);
+                      }
+                    }}
                   >
                     {tab.icon} {tab.label}
                   </button>
@@ -1895,8 +1934,76 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                     <ChevronRight size={18} />
                   </button>
                 </div>
-                {/* TAB 1: SAĞLIK KARNESİ */}
-                {activeResultTab === 'tab-saglik-karnesi' && (
+                {/* Floating Side Navigation Chevrons on Mobile */}
+                <button
+                  onClick={handlePrevTab}
+                  className="mobile-side-nav-btn mobile-side-nav-left"
+                  style={{
+                    position: 'fixed',
+                    left: '12px',
+                    top: '55%',
+                    transform: 'translateY(-50%)',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: 'rgba(10, 11, 15, 0.65)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(197, 160, 89, 0.3)',
+                    color: 'var(--accent-gold)',
+                    display: 'none',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 998,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                >
+                  <ChevronLeft size={20} />
+                </button>
+
+                <button
+                  onClick={handleNextTab}
+                  className="mobile-side-nav-btn mobile-side-nav-right"
+                  style={{
+                    position: 'fixed',
+                    right: '12px',
+                    top: '55%',
+                    transform: 'translateY(-50%)',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: 'rgba(10, 11, 15, 0.65)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(197, 160, 89, 0.3)',
+                    color: 'var(--accent-gold)',
+                    display: 'none',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 998,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                >
+                  <ChevronRight size={20} />
+                </button>
+
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={activeResultTab}
+                    initial={{ opacity: 0, x: slideDirection === 'next' ? 24 : -24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: slideDirection === 'next' ? -24 : 24 }}
+                    transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    style={{ width: '100%', outline: 'none' }}
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
+                  >
+                    {/* TAB 1: SAĞLIK KARNESİ */}
+                    {activeResultTab === 'tab-saglik-karnesi' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   
                   {/* Gauge & Cards Container */}
@@ -3370,6 +3477,8 @@ function Dashboard({ user, onLoginClick }: { user: User | null; onLoginClick?: (
                   </div>
                 </div>
               )}
+                  </motion.div>
+                </AnimatePresence>
 
               {/* Taktiksel Optimizasyon Quick Banner */}
               {activeResultTab !== 'tab-premium' && (

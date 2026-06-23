@@ -1743,3 +1743,20 @@ body {
   }
 }
 
+.mobile-side-nav-btn {
+  display: none !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.mobile-side-nav-btn:active {
+  transform: translateY(-50%) scale(0.9) !important;
+  background: rgba(197, 160, 89, 0.2) !important;
+  border-color: var(--accent-gold) !important;
+}
+
+@media (max-width: 1024px) {
+  .mobile-side-nav-btn {
+    display: flex !important;
+  }
+}
+
